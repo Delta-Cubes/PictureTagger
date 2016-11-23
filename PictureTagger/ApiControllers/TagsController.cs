@@ -12,6 +12,7 @@ using PictureTagger.Models;
 
 namespace PictureTagger.ApiControllers
 {
+    [Authorize]
     public class TagsController : ApiController
     {
         private PictureTaggerContext db = new PictureTaggerContext();
@@ -23,6 +24,7 @@ namespace PictureTagger.ApiControllers
         }
 
         // GET: api/Tags
+        [AllowAnonymous]
         public IQueryable<Tag> GetTags()
         {
             return db.Tags;
@@ -30,6 +32,7 @@ namespace PictureTagger.ApiControllers
 
         // GET: api/Tags/5
         [ResponseType(typeof(Tag))]
+        [AllowAnonymous]
         public IHttpActionResult GetTag(int id)
         {
             Tag tag = db.Tags.Find(id);

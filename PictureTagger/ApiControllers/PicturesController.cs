@@ -12,6 +12,7 @@ using PictureTagger.Models;
 
 namespace PictureTagger.ApiControllers
 {
+    [Authorize]
     public class PicturesController : ApiController
     {
         private PictureTaggerContext db = new PictureTaggerContext();

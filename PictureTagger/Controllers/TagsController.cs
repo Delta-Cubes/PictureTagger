@@ -10,17 +10,20 @@ using PictureTagger.Models;
 
 namespace PictureTagger.Controllers
 {
+    [Authorize]
     public class TagsController : Controller
     {
         private PictureTaggerContext db = new PictureTaggerContext();
 
         // GET: Tags
+        [AllowAnonymous]
         public ActionResult Index()
         {
             return View(db.Tags.ToList());
         }
 
         // GET: Tags/Details/5
+        [AllowAnonymous]
         public ActionResult Details(int? id)
         {
             if (id == null)

@@ -10,11 +10,13 @@ using PictureTagger.Models;
 
 namespace PictureTagger.Controllers
 {
+    [Authorize]
     public class PicturesController : Controller
     {
         private PictureTaggerContext db = new PictureTaggerContext();
 
         // GET: Pictures
+        [AllowAnonymous]
         public ActionResult Index()
         {
             var pictures = db.Pictures.Include(p => p.AspNetUser);
@@ -22,6 +24,7 @@ namespace PictureTagger.Controllers
         }
 
         // GET: Pictures/Details/5
+        [AllowAnonymous]
         public ActionResult Details(int? id)
         {
             if (id == null)
