@@ -57,7 +57,7 @@ namespace PictureTagger.Models
 				.Map(m => m.ToTable("PictureTags").MapLeftKey("PictureID").MapRightKey("TagID"));
 
 			modelBuilder.Entity<Tag>()
-				.Property(e => e.Tag1)
+				.Property(e => e.TagLabel)
 				.IsUnicode(false);
 		}
 	}

@@ -19,7 +19,7 @@ namespace PictureTagger.Models
         [Column("Tag")]
         [Required]
         [StringLength(20)]
-        public string Tag1 { get; set; }
+        public string TagLabel { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Picture> Pictures { get; set; }

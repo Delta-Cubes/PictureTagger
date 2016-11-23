@@ -49,7 +49,7 @@ namespace PictureTagger.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TagID,Tag1")] Tag tag)
+        public ActionResult Create([Bind(Include = "TagID,TagLabel")] Tag tag)
         {
             if (ModelState.IsValid)
             {
@@ -81,7 +81,7 @@ namespace PictureTagger.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TagID,Tag1")] Tag tag)
+        public ActionResult Edit([Bind(Include = "TagID,TagLabel")] Tag tag)
         {
             if (ModelState.IsValid)
             {
