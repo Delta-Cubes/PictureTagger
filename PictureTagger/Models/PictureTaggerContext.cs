@@ -8,7 +8,7 @@ namespace PictureTagger.Models
 	public partial class PictureTaggerContext : DbContext
 	{
 		public PictureTaggerContext()
-			: base("name=PictureTaggerContext")
+			: base("name=DefaultConnection")
 		{
 		}
 
