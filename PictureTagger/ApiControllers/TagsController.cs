@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using PictureTagger.Models;
+using PictureTagger.Models.ApiModels;
 
 namespace PictureTagger.ApiControllers
 {
@@ -25,13 +26,17 @@ namespace PictureTagger.ApiControllers
 
         // GET: api/Tags
         [AllowAnonymous]
-        public IQueryable<Tag> GetTags()
+        public IQueryable<TagApiModel> GetTags()
         {
-            return db.Tags;
+            return db.Tags.Select(t => new TagApiModel()
+            {
+                TagID = t.TagID,
+                TagLabel = t.TagLabel
+            });
         }
 
         // GET: api/Tags/5
-        [ResponseType(typeof(Tag))]
+        [ResponseType(typeof(TagApiModel))]
         [AllowAnonymous]
         public IHttpActionResult GetTag(int id)
         {
@@ -41,7 +46,13 @@ namespace PictureTagger.ApiControllers
                 return NotFound();
             }
 
-            return Ok(tag);
+            TagApiModel tagApi = new TagApiModel()
+            {
+                TagID = tag.TagID,
+                TagLabel = tag.TagLabel
+            };
+
+            return Ok(tagApi);
         }
 
         // PUT: api/Tags/5
@@ -78,20 +89,26 @@ namespace PictureTagger.ApiControllers
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+        //TODO Fix Put
 
         // POST: api/Tags
-        [ResponseType(typeof(Tag))]
-        public IHttpActionResult PostTag(Tag tag)
+        [ResponseType(typeof(TagApiModel))]
+        public IHttpActionResult PostTag(TagApiModel tagApi)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            Tag tag = new Tag()
+            {
+                 TagLabel = tagApi.TagLabel
+            };
+
             db.Tags.Add(tag);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = tag.TagID }, tag);
+            return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
         }
 
         // DELETE: api/Tags/5
@@ -103,6 +120,8 @@ namespace PictureTagger.ApiControllers
             {
                 return NotFound();
             }
+
+            tag.Pictures.Clear();
 
             db.Tags.Remove(tag);
             db.SaveChanges();

@@ -38,6 +38,9 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script type="text/javascript">
+        var apiBaseUrl = '@Url.Content(PictureTagger.WebApiConfig.UrlPrefixRelative)';
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
