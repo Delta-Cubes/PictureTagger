@@ -7,19 +7,29 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using PictureTagger.Models;
+using PictureTagger.Repositories;
 
 namespace PictureTagger.Controllers
 {
     [Authorize]
     public class TagsController : Controller
     {
-        private PictureTaggerContext db = new PictureTaggerContext();
+        private IRepository<Tag> dbTagsRepository;
+
+        public TagsController() : this(new TagRepository())
+        {
+        }
+
+        public TagsController(IRepository<Tag> dbTagsRepository)
+        {
+            this.dbTagsRepository = dbTagsRepository;
+        }
 
         // GET: Tags
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View(db.Tags.ToList());
+            return View(dbTagsRepository.Get().ToList());
         }
 
         // GET: Tags/Details/5
@@ -30,7 +40,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Tag tag = db.Tags.Find(id);
+            Tag tag = dbTagsRepository.Get(id);
             if (tag == null)
             {
                 return HttpNotFound();
@@ -53,8 +63,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Tags.Add(tag);
-                db.SaveChanges();
+                dbTagsRepository.Post(tag);
                 return RedirectToAction("Index");
             }
 
@@ -68,7 +77,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Tag tag = db.Tags.Find(id);
+            Tag tag = dbTagsRepository.Get(id);
             if (tag == null)
             {
                 return HttpNotFound();
@@ -85,8 +94,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(tag).State = EntityState.Modified;
-                db.SaveChanges();
+                dbTagsRepository.Put(tag);
                 return RedirectToAction("Index");
             }
             return View(tag);
@@ -99,7 +107,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Tag tag = db.Tags.Find(id);
+            Tag tag = dbTagsRepository.Get(id);
             if (tag == null)
             {
                 return HttpNotFound();
@@ -112,9 +120,8 @@ namespace PictureTagger.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Tag tag = db.Tags.Find(id);
-            db.Tags.Remove(tag);
-            db.SaveChanges();
+            Tag tag = dbTagsRepository.Get(id);
+            dbTagsRepository.Delete(id);
             return RedirectToAction("Index");
         }
 
@@ -122,7 +129,7 @@ namespace PictureTagger.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                dbTagsRepository.Dispose();
             }
             base.Dispose(disposing);
         }

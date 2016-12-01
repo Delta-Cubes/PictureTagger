@@ -7,19 +7,31 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using PictureTagger.Models;
+using PictureTagger.Repositories;
 
 namespace PictureTagger.Controllers
 {
     [Authorize]
     public class PicturesController : Controller
     {
-        private PictureTaggerContext db = new PictureTaggerContext();
+        private IRepository<Picture> dbPicturesRepository;
+        private IRepository<AspNetUser> dbAspNetUsersRepository;
+
+        public PicturesController() : this(new PicturesRepository(), new AspNetUsersRepository())
+        {
+        }
+
+        public PicturesController(IRepository<Picture> dbPicturesRepository, IRepository<AspNetUser> dbAspNetUsersRepository)
+        {
+            this.dbPicturesRepository = dbPicturesRepository;
+            this.dbAspNetUsersRepository = dbAspNetUsersRepository;
+        }
 
         // GET: Pictures
         [AllowAnonymous]
         public ActionResult Index()
         {
-            var pictures = db.Pictures.Include(p => p.AspNetUser);
+            var pictures = dbPicturesRepository.Get().Include(p => p.AspNetUser);
             return View(pictures.ToList());
         }
 
@@ -31,7 +43,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return HttpNotFound();
@@ -42,7 +54,7 @@ namespace PictureTagger.Controllers
         // GET: Pictures/Create
         public ActionResult Create()
         {
-            ViewBag.OwnerID = new SelectList(db.AspNetUsers, "Id", "Email");
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email");
             return View();
         }
 
@@ -55,12 +67,11 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Pictures.Add(picture);
-                db.SaveChanges();
+                dbPicturesRepository.Post(picture);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.OwnerID = new SelectList(db.AspNetUsers, "Id", "Email", picture.OwnerID);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
             return View(picture);
         }
 
@@ -71,12 +82,12 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.OwnerID = new SelectList(db.AspNetUsers, "Id", "Email", picture.OwnerID);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
             return View(picture);
         }
 
@@ -89,11 +100,10 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(picture).State = EntityState.Modified;
-                db.SaveChanges();
+                dbPicturesRepository.Put(picture);
                 return RedirectToAction("Index");
             }
-            ViewBag.OwnerID = new SelectList(db.AspNetUsers, "Id", "Email", picture.OwnerID);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
             return View(picture);
         }
 
@@ -104,7 +114,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return HttpNotFound();
@@ -117,9 +127,8 @@ namespace PictureTagger.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Picture picture = db.Pictures.Find(id);
-            db.Pictures.Remove(picture);
-            db.SaveChanges();
+            Picture picture = dbPicturesRepository.Get(id);
+            dbPicturesRepository.Delete(id);
             return RedirectToAction("Index");
         }
 
@@ -127,7 +136,8 @@ namespace PictureTagger.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                dbPicturesRepository.Dispose();
+                dbAspNetUsersRepository.Dispose();
             }
             base.Dispose(disposing);
         }

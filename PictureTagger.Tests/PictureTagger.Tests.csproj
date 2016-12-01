@@ -84,6 +84,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\HomeControllerTest.cs" />
+    <Compile Include="Repositories\FakeTagsRepository.cs" />
+    <Compile Include="Repositories\FakePicturesRepository.cs" />
+    <Compile Include="Repositories\FakeRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
@@ -96,6 +99,9 @@
       <Project>{17ECBD44-F1B7-4357-9CF5-1F39A22F31D5}</Project>
       <Name>PictureTagger</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ApiControllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

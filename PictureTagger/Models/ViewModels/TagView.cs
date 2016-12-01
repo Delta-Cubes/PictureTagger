@@ -5,7 +5,7 @@ using System.Web;
 
 namespace PictureTagger.Models.ViewModels
 {
-    public class TagViewModel
+    public class TagView
     {
         public int TagID { get; set; }
         public string TagLabel { get; set; }

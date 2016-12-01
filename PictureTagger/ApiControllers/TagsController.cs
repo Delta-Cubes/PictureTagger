@@ -10,25 +10,29 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
+using PictureTagger.Repositories;
 
 namespace PictureTagger.ApiControllers
 {
     [Authorize]
     public class TagsController : ApiController
     {
-        private PictureTaggerContext db = new PictureTaggerContext();
-
-        public TagsController()
+        private IRepository<Tag> dbTagsRepository;
+        
+        public TagsController() : this(new TagRepository(true))
         {
-            db.Configuration.ProxyCreationEnabled = false;
-            db.Configuration.LazyLoadingEnabled = false;
+        }
+
+        public TagsController(IRepository<Tag> dbTagsRepository)
+        {
+            this.dbTagsRepository = dbTagsRepository;
         }
 
         // GET: api/Tags
         [AllowAnonymous]
-        public IQueryable<TagApiModel> GetTags()
+        public IQueryable<TagApi> GetTags()
         {
-            return db.Tags.Select(t => new TagApiModel()
+            return dbTagsRepository.Get().Select(t => new TagApi()
             {
                 TagID = t.TagID,
                 TagLabel = t.TagLabel
@@ -36,17 +40,17 @@ namespace PictureTagger.ApiControllers
         }
 
         // GET: api/Tags/5
-        [ResponseType(typeof(TagApiModel))]
+        [ResponseType(typeof(TagApi))]
         [AllowAnonymous]
         public IHttpActionResult GetTag(int id)
         {
-            Tag tag = db.Tags.Find(id);
+            Tag tag = dbTagsRepository.Get(id);
             if (tag == null)
             {
                 return NotFound();
             }
 
-            TagApiModel tagApi = new TagApiModel()
+            TagApi tagApi = new TagApi()
             {
                 TagID = tag.TagID,
                 TagLabel = tag.TagLabel
@@ -69,11 +73,10 @@ namespace PictureTagger.ApiControllers
                 return BadRequest();
             }
 
-            db.Entry(tag).State = EntityState.Modified;
-
+            
             try
             {
-                db.SaveChanges();
+                dbTagsRepository.Put(tag);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -92,8 +95,8 @@ namespace PictureTagger.ApiControllers
         //TODO Fix Put
 
         // POST: api/Tags
-        [ResponseType(typeof(TagApiModel))]
-        public IHttpActionResult PostTag(TagApiModel tagApi)
+        [ResponseType(typeof(TagApi))]
+        public IHttpActionResult PostTag(TagApi tagApi)
         {
             if (!ModelState.IsValid)
             {
@@ -105,8 +108,7 @@ namespace PictureTagger.ApiControllers
                  TagLabel = tagApi.TagLabel
             };
 
-            db.Tags.Add(tag);
-            db.SaveChanges();
+            dbTagsRepository.Post(tag);
 
             return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
         }
@@ -115,7 +117,7 @@ namespace PictureTagger.ApiControllers
         [ResponseType(typeof(Tag))]
         public IHttpActionResult DeleteTag(int id)
         {
-            Tag tag = db.Tags.Find(id);
+            Tag tag = dbTagsRepository.Get(id);
             if (tag == null)
             {
                 return NotFound();
@@ -123,8 +125,7 @@ namespace PictureTagger.ApiControllers
 
             tag.Pictures.Clear();
 
-            db.Tags.Remove(tag);
-            db.SaveChanges();
+            dbTagsRepository.Delete(id);
 
             return Ok(tag);
         }
@@ -133,14 +134,14 @@ namespace PictureTagger.ApiControllers
         {
             if (disposing)
             {
-                db.Dispose();
+                dbTagsRepository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool TagExists(int id)
         {
-            return db.Tags.Count(e => e.TagID == id) > 0;
+            return dbTagsRepository.Get().Count(e => e.TagID == id) > 0;
         }
     }
 }

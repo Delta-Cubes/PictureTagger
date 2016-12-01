@@ -5,7 +5,7 @@ using System.Web;
 
 namespace PictureTagger.Models.ApiModels
 {
-    public class PictureAPIModel
+    public class PictureApi
     {
         public int PictureID { get; set; }
         public string OwnerID { get; set; }

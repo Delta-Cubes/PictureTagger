@@ -13,24 +13,30 @@ using System.Web.Http.Description;
 using Microsoft.AspNet.Identity;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
+using PictureTagger.Repositories;
 
 namespace PictureTagger.ApiControllers
 {
     [Authorize]
     public class PicturesController : ApiController
     {
-        private PictureTaggerContext db = new PictureTaggerContext();
+        private IRepository<Picture> dbPicturesRepository;
+        private IRepository<Tag> dbTagsRepository;
 
-        public PicturesController()
+        public PicturesController() : this(new PicturesRepository(true), new TagRepository(true))
         {
-            db.Configuration.ProxyCreationEnabled = false;
-            db.Configuration.LazyLoadingEnabled = false;
+        }
+
+        public PicturesController(IRepository<Picture> dbPicturesRepository, IRepository<Tag> dbTagsRepository)
+        {
+            this.dbPicturesRepository = dbPicturesRepository;
+            this.dbTagsRepository = dbTagsRepository;
         }
 
         // GET: api/Pictures
-        public IQueryable<PictureAPIModel> GetPictures()
+        public IQueryable<PictureApi> GetPictures()
         {
-            return db.Pictures.Select(p => new PictureAPIModel()
+            return dbPicturesRepository.Get().Select(p => new PictureApi()
             {
                 PictureID = p.PictureID,
                 Name = p.Name,
@@ -40,16 +46,16 @@ namespace PictureTagger.ApiControllers
         }
 
         // GET: api/Pictures/5
-        [ResponseType(typeof(PictureAPIModel))]
+        [ResponseType(typeof(PictureApi))]
         public IHttpActionResult GetPicture(int id)
         {
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return NotFound();
             }
 
-            PictureAPIModel pictureApi = new PictureAPIModel()
+            PictureApi pictureApi = new PictureApi()
             {
                 PictureID = picture.PictureID,
                 Name = picture.Name,
@@ -65,7 +71,7 @@ namespace PictureTagger.ApiControllers
         [ResponseType(typeof(Bitmap))]
         public HttpResponseMessage GetPictureRaw(int id)
         {
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return (new HttpResponseMessage(HttpStatusCode.NotFound));
@@ -97,11 +103,9 @@ namespace PictureTagger.ApiControllers
                 return BadRequest();
             }
 
-            db.Entry(picture).State = EntityState.Modified;
-
             try
             {
-                db.SaveChanges();
+                dbPicturesRepository.Put(picture);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -121,8 +125,8 @@ namespace PictureTagger.ApiControllers
         //TODO Fix Put.
 
         // POST: api/Pictures
-        [ResponseType(typeof(PictureAPIModel))]
-        public IHttpActionResult PostPicture(PictureAPIModel pictureApi)
+        [ResponseType(typeof(PictureApi))]
+        public IHttpActionResult PostPicture(PictureApi pictureApi)
         {
             if (!ModelState.IsValid)
             {
@@ -135,13 +139,12 @@ namespace PictureTagger.ApiControllers
                 Data = pictureApi.Data,
                 FileType = pictureApi.FileType,
                 OwnerID = User.Identity.GetUserId(),
-                Tags = db.Tags.Where(t => pictureApi.TagsIds.Contains(t.TagID)).ToList()
+                Tags = dbTagsRepository.Get().Where(t => pictureApi.TagsIds.Contains(t.TagID)).ToList()
             };
 
-            db.Pictures.Add(picture);
-            db.SaveChanges();
+            dbPicturesRepository.Post(picture);
 
-            pictureApi = new PictureAPIModel()
+            pictureApi = new PictureApi()
             {
                 Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
                 OwnerID = User.Identity.GetUserName()
@@ -154,7 +157,7 @@ namespace PictureTagger.ApiControllers
         [ResponseType(typeof(Picture))]
         public IHttpActionResult DeletePicture(int id)
         {
-            Picture picture = db.Pictures.Find(id);
+            Picture picture = dbPicturesRepository.Get(id);
             if (picture == null)
             {
                 return NotFound();
@@ -162,8 +165,7 @@ namespace PictureTagger.ApiControllers
 
             picture.Tags.Clear();
 
-            db.Pictures.Remove(picture);
-            db.SaveChanges();
+            dbPicturesRepository.Delete(id);
 
             return Ok(picture);
         }
@@ -172,14 +174,15 @@ namespace PictureTagger.ApiControllers
         {
             if (disposing)
             {
-                db.Dispose();
+                dbPicturesRepository.Dispose();
+                dbTagsRepository.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool PictureExists(int id)
         {
-            return db.Pictures.Count(e => e.PictureID == id) > 0;
+            return dbPicturesRepository.Get().Count(e => e.PictureID == id) > 0;
         }
     }
 }

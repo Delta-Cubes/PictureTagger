@@ -5,7 +5,7 @@ using System.Web;
 
 namespace PictureTagger.Models.ApiModels
 {
-    public class TagApiModel
+    public class TagApi
     {
         public int TagID { get; set; }
         public string TagLabel { get; set; }

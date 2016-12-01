@@ -219,8 +219,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\ApiModels\PictureAPIModel.cs" />
-    <Compile Include="Models\ApiModels\TagApiModel.cs" />
+    <Compile Include="Models\ApiModels\PictureApi.cs" />
+    <Compile Include="Models\ApiModels\TagApi.cs" />
     <Compile Include="Models\AspNetRole.cs" />
     <Compile Include="Models\AspNetUser.cs" />
     <Compile Include="Models\AspNetUserClaim.cs" />
@@ -231,10 +231,13 @@
     <Compile Include="Models\Picture.cs" />
     <Compile Include="Models\PictureTaggerContext.cs" />
     <Compile Include="Models\Tag.cs" />
-    <Compile Include="Models\ViewModels\PictureViewModel.cs" />
-    <Compile Include="Models\ViewModels\TagViewModel.cs" />
+    <Compile Include="Models\ViewModels\PictureView.cs" />
+    <Compile Include="Models\ViewModels\TagView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\TagsRepository.cs" />
+    <Compile Include="Repositories\PicturesRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
