@@ -1,31 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using PictureTagger.Models;
 
 namespace PictureTagger.Repositories
 {
-    public abstract class DatabaseRepository<T> : IRepository<T>
+    public class DatabaseRepository<T> : IRepository<T>
+        where T : class
     {
         protected PictureTaggerContext dbContext;
 
-        protected DatabaseRepository()
+        public DatabaseRepository()
         {
             dbContext = new PictureTaggerContext();
         }
 
-        protected DatabaseRepository(bool isApiController) : this()
+        public DatabaseRepository(bool isApiController) : this()
         {
             dbContext.Configuration.ProxyCreationEnabled = !isApiController;
             dbContext.Configuration.LazyLoadingEnabled = !isApiController;
         }
 
-        public abstract IQueryable<T> Get();
-        public abstract T Get(int? id);
-        public abstract void Post(T _model);
-        public abstract void Put(T _model);
-        public abstract void Delete(int? id);
+        public IQueryable<T> Get()
+        {
+            return dbContext.Set<T>();
+        }
+
+        public T Get(int? id)
+        {
+            return dbContext.Set<T>().Find(id);
+        }
+
+        public void Post(T _model)
+        {
+            dbContext.Set<T>().Add(_model);
+            dbContext.SaveChanges();
+        }
+
+        public void Put(T _model)
+        {
+            dbContext.Entry(_model).State = EntityState.Modified;
+            dbContext.SaveChanges();
+        }
+
+        public void Delete(int? id)
+        {
+            T _model = dbContext.Set<T>().Find(id);
+            dbContext.Set<T>().Remove(_model);
+        }
 
         public void Dispose()
         {

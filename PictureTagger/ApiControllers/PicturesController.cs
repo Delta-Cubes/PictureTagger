@@ -23,7 +23,7 @@ namespace PictureTagger.ApiControllers
         private IRepository<Picture> dbPicturesRepository;
         private IRepository<Tag> dbTagsRepository;
 
-        public PicturesController() : this(new PicturesRepository(true), new TagRepository(true))
+        public PicturesController() : this(new DatabaseRepository<Picture>(true), new DatabaseRepository<Tag>(true))
         {
         }
 

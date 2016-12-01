@@ -17,7 +17,7 @@ namespace PictureTagger.Controllers
         private IRepository<Picture> dbPicturesRepository;
         private IRepository<AspNetUser> dbAspNetUsersRepository;
 
-        public PicturesController() : this(new PicturesRepository(), new AspNetUsersRepository())
+        public PicturesController() : this(new DatabaseRepository<Picture>(), new DatabaseRepository<AspNetUser>())
         {
         }
 

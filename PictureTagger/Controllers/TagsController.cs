@@ -16,7 +16,7 @@ namespace PictureTagger.Controllers
     {
         private IRepository<Tag> dbTagsRepository;
 
-        public TagsController() : this(new TagRepository())
+        public TagsController() : this(new DatabaseRepository<Tag>())
         {
         }
 

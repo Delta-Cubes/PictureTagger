@@ -7,15 +7,16 @@ using PictureTagger.Repositories;
 
 namespace PictureTagger.Tests.Repositories
 {
-    public abstract class FakeRepository<T> : IRepository<T>
+    public class FakeRepository<T> : IRepository<T>
     {
 
         private IDictionary<int, T> _Entities;
 
+        public Func<T, int> EntityId;
+
         public FakeRepository()
         {
             _Entities = new Dictionary<int, T>();
-
         }
 
         public IQueryable<T> Get()
@@ -48,8 +49,6 @@ namespace PictureTagger.Tests.Repositories
                 _Entities.Remove(EntityId(obj));
             }
         }
-
-        public abstract int EntityId(T _model);
 
         public void Dispose()
         {
