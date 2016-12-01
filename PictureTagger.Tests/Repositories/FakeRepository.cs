@@ -14,8 +14,9 @@ namespace PictureTagger.Tests.Repositories
 
         public Func<T, int> EntityId;
 
-        public FakeRepository()
+        public FakeRepository(Func<T, int> EntityId)
         {
+            this.EntityId = EntityId;
             _Entities = new Dictionary<int, T>();
         }
 
