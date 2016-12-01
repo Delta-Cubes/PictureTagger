@@ -63,7 +63,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                dbTagsRepository.Post(tag);
+                dbTagsRepository.Create(tag);
                 return RedirectToAction("Index");
             }
 
@@ -94,7 +94,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                dbTagsRepository.Put(tag);
+                dbTagsRepository.Update(tag);
                 return RedirectToAction("Index");
             }
             return View(tag);

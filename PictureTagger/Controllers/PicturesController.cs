@@ -67,7 +67,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                dbPicturesRepository.Post(picture);
+                dbPicturesRepository.Create(picture);
                 return RedirectToAction("Index");
             }
 
@@ -100,7 +100,7 @@ namespace PictureTagger.Controllers
         {
             if (ModelState.IsValid)
             {
-                dbPicturesRepository.Put(picture);
+                dbPicturesRepository.Update(picture);
                 return RedirectToAction("Index");
             }
             ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);

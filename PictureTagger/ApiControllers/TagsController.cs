@@ -76,7 +76,7 @@ namespace PictureTagger.ApiControllers
             
             try
             {
-                dbTagsRepository.Put(tag);
+                dbTagsRepository.Update(tag);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -108,7 +108,7 @@ namespace PictureTagger.ApiControllers
                  TagLabel = tagApi.TagLabel
             };
 
-            dbTagsRepository.Post(tag);
+            dbTagsRepository.Create(tag);
 
             return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
         }

@@ -1,59 +1,39 @@
-﻿using System;
+﻿using PictureTagger.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PictureTagger.Repositories;
 
 namespace PictureTagger.Tests.Repositories
 {
-    public class FakeRepository<T> : IRepository<T>
-    {
+	public class FakeRepository<T> : IRepository<T>
+	{
+		private readonly Func<T, int> _entityId;
+		private readonly IDictionary<int, T> _entities;
 
-        private IDictionary<int, T> _Entities;
+		public FakeRepository(Func<T, int> entityId)
+		{
+			if (entityId == null) throw new ArgumentNullException(nameof(entityId));
+			_entityId = entityId;
+			_entities = new Dictionary<int, T>();
+		}
 
-        public Func<T, int> EntityId;
+		public void Create(T _model) => _entities.Add(_entityId(_model), _model);
 
-        public FakeRepository(Func<T, int> EntityId)
-        {
-            this.EntityId = EntityId;
-            _Entities = new Dictionary<int, T>();
-        }
+		public void Delete(int? id) => Delete(Get(id));
 
-        public IQueryable<T> Get()
-        {
-            return _Entities.Select(e => e.Value).AsQueryable();
-        }
+		public void Delete(T model) => _entities.Remove(_entityId(model));
 
-        public T Get(int? id)
-        {
-            T obj = default(T);
-            _Entities.TryGetValue(id ?? -1, out obj);
-            return obj;
-        }
+		public void Dispose() => _entities.Clear();
 
-        public void Post(T _model)
-        {
-            _Entities.Add(EntityId(_model), _model);
-        }
+		public IQueryable<T> Get() => _entities.Values.AsQueryable();
 
-        public void Put(T _model)
-        {
-            _Entities[EntityId(_model)] = _model;
-        }
+		public T Get(int? id)
+		{
+			T obj = default(T);
+			_entities.TryGetValue(id ?? -1, out obj);
+			return obj;
+		}
 
-        public void Delete(int? id)
-        {
-            T obj;
-            if (_Entities.TryGetValue(id ?? -1, out obj))
-            {
-                _Entities.Remove(EntityId(obj));
-            }
-        }
-
-        public void Dispose()
-        {
-            _Entities.Clear();
-        }
-    }
+		public void Update(T _model) => _entities[_entityId(_model)] = _model;
+	}
 }

@@ -105,7 +105,7 @@ namespace PictureTagger.ApiControllers
 
             try
             {
-                dbPicturesRepository.Put(picture);
+                dbPicturesRepository.Update(picture);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -142,7 +142,7 @@ namespace PictureTagger.ApiControllers
                 Tags = dbTagsRepository.Get().Where(t => pictureApi.TagsIds.Contains(t.TagID)).ToList()
             };
 
-            dbPicturesRepository.Post(picture);
+            dbPicturesRepository.Create(picture);
 
             pictureApi = new PictureApi()
             {

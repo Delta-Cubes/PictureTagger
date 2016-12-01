@@ -1,59 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using PictureTagger.Models;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
-using PictureTagger.Models;
 
 namespace PictureTagger.Repositories
 {
-    public class DatabaseRepository<T> : IRepository<T>
-        where T : class
-    {
-        protected PictureTaggerContext dbContext;
+	public class DatabaseRepository<T> : IRepository<T>
+		where T : class
+	{
+		protected PictureTaggerContext dbContext;
 
-        public DatabaseRepository()
-        {
-            dbContext = new PictureTaggerContext();
-        }
+		public DatabaseRepository()
+		{
+			dbContext = new PictureTaggerContext();
+		}
 
-        public DatabaseRepository(bool isApiController) : this()
-        {
-            dbContext.Configuration.ProxyCreationEnabled = !isApiController;
-            dbContext.Configuration.LazyLoadingEnabled = !isApiController;
-        }
+		public DatabaseRepository(bool isApiController) : this()
+		{
+			dbContext.Configuration.ProxyCreationEnabled = !isApiController;
+			dbContext.Configuration.LazyLoadingEnabled = !isApiController;
+		}
 
-        public IQueryable<T> Get()
-        {
-            return dbContext.Set<T>();
-        }
+		public void Create(T model)
+		{
+			dbContext.Set<T>().Add(model);
+			dbContext.SaveChanges();
+		}
 
-        public T Get(int? id)
-        {
-            return dbContext.Set<T>().Find(id);
-        }
+		public void Delete(int? id) => Delete(Get(id));
 
-        public void Post(T _model)
-        {
-            dbContext.Set<T>().Add(_model);
-            dbContext.SaveChanges();
-        }
+		public void Delete(T model)
+		{
+			dbContext.Set<T>().Remove(model);
+			dbContext.SaveChanges();
+		}
 
-        public void Put(T _model)
-        {
-            dbContext.Entry(_model).State = EntityState.Modified;
-            dbContext.SaveChanges();
-        }
+		public void Dispose()
+		{
+			dbContext.Dispose();
+		}
 
-        public void Delete(int? id)
-        {
-            T _model = dbContext.Set<T>().Find(id);
-            dbContext.Set<T>().Remove(_model);
-        }
+		public IQueryable<T> Get() => dbContext.Set<T>();
 
-        public void Dispose()
-        {
-            dbContext.Dispose();
-        }
-    }
+		public T Get(int? id) => dbContext.Set<T>().Find(id);
+
+		public void Update(T model)
+		{
+			dbContext.Entry(model).State = EntityState.Modified;
+			dbContext.SaveChanges();
+		}
+	}
 }
