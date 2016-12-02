@@ -34,10 +34,7 @@ namespace PictureTagger.Repositories
 			dbContext.SaveChanges();
 		}
 
-		public void Dispose()
-		{
-			dbContext.Dispose();
-		}
+		public void Dispose() => dbContext.Dispose();
 
 		public IQueryable<T> Get() => dbContext.Set<T>();
 
