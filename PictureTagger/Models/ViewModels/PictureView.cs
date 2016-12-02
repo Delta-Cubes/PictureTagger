@@ -15,7 +15,7 @@ namespace PictureTagger.Models.ViewModels
         public string Name { get; set; }
         public virtual ICollection<TagView> Tags { get; set; }
 
-        public static explicit operator PictureView(Picture picture)
+        public static implicit operator PictureView(Picture picture)
         {
             return new PictureView()
             {

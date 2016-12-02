@@ -38,7 +38,7 @@ namespace PictureTagger.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Tag> Tags { get; set; }
 
-        public static explicit operator Picture(PictureView pictureView)
+        public static implicit operator Picture(PictureView pictureView)
         {
             return new Picture()
             {
@@ -50,7 +50,7 @@ namespace PictureTagger.Models
             };
         }
 
-        public static explicit operator Picture(PictureApi pictureApi)
+        public static implicit operator Picture(PictureApi pictureApi)
         {
             return new Picture()
             {

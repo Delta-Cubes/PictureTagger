@@ -15,7 +15,7 @@ namespace PictureTagger.Models.ApiModels
         public string Name { get; set; }
         public virtual ICollection<Int32> TagsIds { get; set; }
 
-        public static explicit operator PictureApi(Picture picture)
+        public static implicit operator PictureApi(Picture picture)
         {
             return new PictureApi()
             {
