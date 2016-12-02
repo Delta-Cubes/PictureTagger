@@ -11,5 +11,14 @@ namespace PictureTagger.Models.ViewModels
         public string TagLabel { get; set; }
         public bool TagSelected { get; set; }
         public virtual ICollection<Picture> Pictures { get; set; }
+
+        public static explicit operator TagView(Tag tag)
+        {
+            return new TagView()
+            {
+                TagID = tag.TagID,
+                TagLabel = tag.TagLabel
+            };
+        }
     }
 }

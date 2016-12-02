@@ -11,5 +11,14 @@ namespace PictureTagger.Models.ApiModels
         public string TagLabel { get; set; }
         public bool TagSelected { get; set; }
         public virtual ICollection<Int32> PicturesIds { get; set; }
+
+        public static explicit operator TagApi(Tag tag)
+        {
+            return new TagApi()
+            {
+                TagID = tag.TagID,
+                TagLabel = tag.TagLabel
+            };
+        }
     }
 }

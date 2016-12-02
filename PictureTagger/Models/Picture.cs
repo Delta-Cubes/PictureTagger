@@ -5,6 +5,8 @@ namespace PictureTagger.Models
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
+    using PictureTagger.Models.ViewModels;
+    using PictureTagger.Models.ApiModels;
 
     public partial class Picture
     {
@@ -35,5 +37,29 @@ namespace PictureTagger.Models
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Tag> Tags { get; set; }
+
+        public static explicit operator Picture(PictureView pictureView)
+        {
+            return new Picture()
+            {
+                PictureID = pictureView.PictureID,
+                Name = pictureView.Name,
+                FileType = pictureView.FileType,
+                Data = pictureView.Data,
+                OwnerID = pictureView.OwnerID
+            };
+        }
+
+        public static explicit operator Picture(PictureApi pictureApi)
+        {
+            return new Picture()
+            {
+                PictureID = pictureApi.PictureID,
+                Name = pictureApi.Name,
+                FileType = pictureApi.FileType,
+                Data = pictureApi.Data,
+                OwnerID = pictureApi.OwnerID
+            };
+        }
     }
 }
