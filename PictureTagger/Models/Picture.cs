@@ -54,7 +54,7 @@ namespace PictureTagger.Models
                 Data = pictureView.Data,
                 OwnerID = pictureView.OwnerID,
                 AspNetUser = userRepository.GetAll().FirstOrDefault(u => u.Id == pictureView.OwnerID),
-                Tags = pictureView.Tags.Cast<Tag>().ToList()
+                Tags = pictureView.TagsIds.Select(t => tagRepository.Find(t)).ToList()
             };
         }
 

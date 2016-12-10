@@ -9,7 +9,7 @@ namespace PictureTagger.Models.ViewModels
     {
         public int TagID { get; set; }
         public string TagLabel { get; set; }
-        public virtual ICollection<PictureView> Pictures { get; set; }
+        public virtual ICollection<Int32> PicturesIds { get; set; }
 
         public static implicit operator TagView(Tag tag)
         {
@@ -17,7 +17,7 @@ namespace PictureTagger.Models.ViewModels
             {
                 TagID = tag.TagID,
                 TagLabel = tag.TagLabel,
-                Pictures = tag.Pictures.Cast<PictureView>().ToList()
+                PicturesIds = tag.Pictures.Select(p => p.PictureID).ToList()
             };
         }
     }

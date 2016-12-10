@@ -38,7 +38,7 @@ namespace PictureTagger.Models
             {
                 TagID = tagView.TagID,
                 TagLabel = tagView.TagLabel,
-                Pictures = tagView.Pictures.Cast<Picture>().ToList()
+                Pictures = tagView.PicturesIds.Select(p => pictureRepository.Find(p)).ToList()
             };
         }
 
