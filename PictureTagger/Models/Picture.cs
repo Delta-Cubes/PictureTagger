@@ -1,3 +1,6 @@
+using System.Linq;
+using PictureTagger.Repositories;
+
 namespace PictureTagger.Models
 {
     using System;
@@ -38,6 +41,8 @@ namespace PictureTagger.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Tag> Tags { get; set; }
 
+        private static IRepository<Tag> tagRepository = new DatabaseRepository<Tag>(true);
+
         public static implicit operator Picture(PictureView pictureView)
         {
             return new Picture()
@@ -46,7 +51,8 @@ namespace PictureTagger.Models
                 Name = pictureView.Name,
                 FileType = pictureView.FileType,
                 Data = pictureView.Data,
-                OwnerID = pictureView.OwnerID
+                OwnerID = pictureView.OwnerID,
+                Tags = pictureView.Tags.Select(t => (Tag)t).ToList()
             };
         }
 
@@ -58,7 +64,8 @@ namespace PictureTagger.Models
                 Name = pictureApi.Name,
                 FileType = pictureApi.FileType,
                 Data = pictureApi.Data,
-                OwnerID = pictureApi.OwnerID
+                OwnerID = pictureApi.OwnerID,
+                Tags = pictureApi.TagsIds.Select(t => tagRepository.Get(t)).ToList()
             };
         }
     }

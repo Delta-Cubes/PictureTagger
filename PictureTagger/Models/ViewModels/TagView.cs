@@ -10,7 +10,7 @@ namespace PictureTagger.Models.ViewModels
         public int TagID { get; set; }
         public string TagLabel { get; set; }
         public bool TagSelected { get; set; }
-        public virtual ICollection<Picture> Pictures { get; set; }
+        public virtual ICollection<PictureView> Pictures { get; set; }
 
         public static implicit operator TagView(Tag tag)
         {
