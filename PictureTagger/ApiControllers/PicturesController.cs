@@ -53,7 +53,9 @@ namespace PictureTagger.ApiControllers
             return Ok(picture);
         }
 
-        // GET: api/Pictures/5/imgage
+        // GET: api/Pictures/5/
+        [AllowAnonymous]
+        [Route("/api/Pictures/{id}/image")]
         [ResponseType(typeof(Bitmap))]
         public HttpResponseMessage GetPictureRaw(int id)
         {

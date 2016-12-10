@@ -50,6 +50,13 @@ namespace PictureTagger.ApiControllers
             return Ok(tag);
         }
 
+        [AllowAnonymous]
+        [Route("/api/Tags/Suggestions")]
+        public IQueryable<TagApi> Suggestions(string partialTag)
+        {
+            return dbTagsRepository.GetAll().Where(t => t.TagLabel.Contains(partialTag)).Cast<TagApi>();
+        }
+
         // PUT: api/Tags/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutTag(int id, TagApi tagApi)
