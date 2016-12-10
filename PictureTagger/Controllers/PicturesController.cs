@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using PictureTagger.Models;
+using PictureTagger.Models.ViewModels;
 using PictureTagger.Repositories;
 
 namespace PictureTagger.Controllers
@@ -31,7 +33,7 @@ namespace PictureTagger.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            var pictures = dbPicturesRepository.Get().Include(p => p.AspNetUser);
+            var pictures = dbPicturesRepository.GetAll().Include(p => p.AspNetUser).Cast<PictureView>();
             return View(pictures.ToList());
         }
 
@@ -43,7 +45,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = dbPicturesRepository.Get(id);
+            Picture picture = dbPicturesRepository.Find(id);
             if (picture == null)
             {
                 return HttpNotFound();
@@ -54,7 +56,7 @@ namespace PictureTagger.Controllers
         // GET: Pictures/Create
         public ActionResult Create()
         {
-            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email");
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.GetAll(), "Id", "Email");
             return View();
         }
 
@@ -63,16 +65,17 @@ namespace PictureTagger.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "PictureID,OwnerID,Data,FileType,Name")] Picture picture)
+        public ActionResult Create([Bind(Include = "Data,FileType,Name")] PictureView pictureView)
         {
             if (ModelState.IsValid)
             {
-                dbPicturesRepository.Create(picture);
+                pictureView.OwnerID = User.Identity.GetUserId();
+                dbPicturesRepository.Create(pictureView);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
-            return View(picture);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.GetAll(), "Id", "Email", pictureView.OwnerID);
+            return View(pictureView);
         }
 
         // GET: Pictures/Edit/5
@@ -82,12 +85,12 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = dbPicturesRepository.Get(id);
+            Picture picture = dbPicturesRepository.Find(id);
             if (picture == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.GetAll(), "Id", "Email", picture.OwnerID);
             return View(picture);
         }
 
@@ -96,15 +99,15 @@ namespace PictureTagger.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "PictureID,OwnerID,Data,FileType,Name")] Picture picture)
+        public ActionResult Edit([Bind(Include = "PictureID,Data,FileType,Name")] PictureView pictureVie)
         {
             if (ModelState.IsValid)
             {
-                dbPicturesRepository.Update(picture);
+                dbPicturesRepository.Update(pictureVie);
                 return RedirectToAction("Index");
             }
-            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.Get(), "Id", "Email", picture.OwnerID);
-            return View(picture);
+            ViewBag.OwnerID = new SelectList(dbAspNetUsersRepository.GetAll(), "Id", "Email", pictureVie.OwnerID);
+            return View(pictureVie);
         }
 
         // GET: Pictures/Delete/5
@@ -114,7 +117,7 @@ namespace PictureTagger.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Picture picture = dbPicturesRepository.Get(id);
+            Picture picture = dbPicturesRepository.Find(id);
             if (picture == null)
             {
                 return HttpNotFound();
@@ -127,7 +130,7 @@ namespace PictureTagger.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Picture picture = dbPicturesRepository.Get(id);
+            Picture picture = dbPicturesRepository.Find(id);
             dbPicturesRepository.Delete(id);
             return RedirectToAction("Index");
         }
@@ -143,3 +146,4 @@ namespace PictureTagger.Controllers
         }
     }
 }
+

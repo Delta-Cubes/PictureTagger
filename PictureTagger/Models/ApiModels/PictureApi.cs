@@ -23,7 +23,9 @@ namespace PictureTagger.Models.ApiModels
                 Name = picture.Name,
                 FileType = picture.FileType,
                 Data = picture.Data,
-                OwnerID = picture.OwnerID
+                Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
+                OwnerID = picture.OwnerID,
+                TagsIds = picture.Tags.Select(t=> t.TagID).ToList()
             };
         }
     }

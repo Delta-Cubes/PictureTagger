@@ -23,7 +23,9 @@ namespace PictureTagger.Models.ViewModels
                 Name = picture.Name,
                 FileType = picture.FileType,
                 Data = picture.Data,
-                OwnerID = picture.OwnerID
+                Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
+                OwnerID = picture.OwnerID,
+                Tags = picture.Tags.Cast<TagView>().ToList()
             };
         }
     }

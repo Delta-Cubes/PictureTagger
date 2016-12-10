@@ -14,134 +14,116 @@ using PictureTagger.Repositories;
 
 namespace PictureTagger.ApiControllers
 {
-	[Authorize]
-	public class TagsController : ApiController
-	{
-		private IRepository<Tag> dbTagsRepository;
+    [Authorize]
+    public class TagsController : ApiController
+    {
+        private IRepository<Tag> dbTagsRepository;
 
-		public TagsController() : this(new DatabaseRepository<Tag>(true))
-		{
-		}
+        public TagsController() : this(new DatabaseRepository<Tag>(true))
+        {
+        }
 
-		public TagsController(IRepository<Tag> dbTagsRepository)
-		{
-			this.dbTagsRepository = dbTagsRepository;
-		}
-
-		// GET: api/Tags
-		[AllowAnonymous]
-		public IQueryable<TagApi> GetTags()
-		{
-			return dbTagsRepository.Get().Select(t => new TagApi()
-			{
-				TagID = t.TagID,
-				TagLabel = t.TagLabel
-			});
-		}
-
-		// GET: api/Tags/5
-		[ResponseType(typeof(TagApi))]
-		[AllowAnonymous]
-		public IHttpActionResult GetTag(int id)
-		{
-			Tag tag = dbTagsRepository.Get(id);
-			if (tag == null)
-			{
-				return NotFound();
-			}
-
-			TagApi tagApi = new TagApi()
-			{
-				TagID = tag.TagID,
-				TagLabel = tag.TagLabel
-			};
-
-			return Ok(tagApi);
-		}
-
-		// PUT: api/Tags/5
-		[ResponseType(typeof(void))]
-		public IHttpActionResult PutTag(int id, Tag tag)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-
-			if (id != tag.TagID)
-			{
-				return BadRequest();
-			}
+        public TagsController(IRepository<Tag> dbTagsRepository)
+        {
+            this.dbTagsRepository = dbTagsRepository;
+        }
 
 
-			try
-			{
-				dbTagsRepository.Update(tag);
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!TagExists(id))
-				{
-					return NotFound();
-				}
-				else
-				{
-					throw;
-				}
-			}
+        // GET: api/Tags
+        [AllowAnonymous]
+        public IQueryable<TagApi> GetTags()
+        {
+            return dbTagsRepository.GetAll().Cast<TagApi>();
+        }
 
-			return StatusCode(HttpStatusCode.NoContent);
-		}
-		//TODO Fix Put
+        // GET: api/Tags/5
+        [AllowAnonymous]
+        [ResponseType(typeof(TagApi))]
+        public IHttpActionResult GetTag(int id)
+        {
+            Tag tag = dbTagsRepository.Find(id);
+            if (tag == null)
+            {
+                return NotFound();
+            }
 
-		// POST: api/Tags
-		[ResponseType(typeof(TagApi))]
-		public IHttpActionResult PostTag(TagApi tagApi)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+            return Ok(tag);
+        }
 
-			Tag tag = new Tag()
-			{
-				TagLabel = tagApi.TagLabel
-			};
+        // PUT: api/Tags/5
+        [ResponseType(typeof(void))]
+        public IHttpActionResult PutTag(int id, TagApi tagApi)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-			dbTagsRepository.Create(tag);
+            if (id != tagApi.TagID)
+            {
+                return BadRequest();
+            }
 
-			return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
-		}
+            try
+            {
+                dbTagsRepository.Update(tagApi);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TagExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-		// DELETE: api/Tags/5
-		[ResponseType(typeof(Tag))]
-		public IHttpActionResult DeleteTag(int id)
-		{
-			Tag tag = dbTagsRepository.Get(id);
-			if (tag == null)
-			{
-				return NotFound();
-			}
+            return StatusCode(HttpStatusCode.NoContent);
+        }
 
-			tag.Pictures.Clear();
+        // POST: api/Tags
+        [ResponseType(typeof(Tag))]
+        public IHttpActionResult PostTag(TagApi tagApi)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-			dbTagsRepository.Delete(id);
+            dbTagsRepository.Create(tagApi);
 
-			return Ok(tag);
-		}
+            return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
+        }
 
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				dbTagsRepository.Dispose();
-			}
-			base.Dispose(disposing);
-		}
+        // DELETE: api/Tags/5
+        [ResponseType(typeof(Tag))]
+        public IHttpActionResult DeleteTag(int id)
+        {
+            Tag tag = dbTagsRepository.Find(id);
+            if (tag == null)
+            {
+                return NotFound();
+            }
 
-		private bool TagExists(int id)
-		{
-			return dbTagsRepository.Get().Count(e => e.TagID == id) > 0;
-		}
-	}
+            dbTagsRepository.Delete(tag);
+
+            return Ok(tag);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                dbTagsRepository.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private bool TagExists(int id)
+        {
+            return dbTagsRepository.GetAll().Count(e => e.TagID == id) > 0;
+        }
+    }
 }

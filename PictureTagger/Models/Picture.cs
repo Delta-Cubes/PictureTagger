@@ -42,6 +42,7 @@ namespace PictureTagger.Models
         public virtual ICollection<Tag> Tags { get; set; }
 
         private static IRepository<Tag> tagRepository = new DatabaseRepository<Tag>(true);
+        private static IRepository<AspNetUser> userRepository = new DatabaseRepository<AspNetUser>(true);
 
         public static implicit operator Picture(PictureView pictureView)
         {
@@ -52,7 +53,8 @@ namespace PictureTagger.Models
                 FileType = pictureView.FileType,
                 Data = pictureView.Data,
                 OwnerID = pictureView.OwnerID,
-                Tags = pictureView.Tags.Select(t => (Tag)t).ToList()
+                AspNetUser = userRepository.GetAll().FirstOrDefault(u => u.Id == pictureView.OwnerID),
+                Tags = pictureView.Tags.Cast<Tag>().ToList()
             };
         }
 
@@ -64,8 +66,9 @@ namespace PictureTagger.Models
                 Name = pictureApi.Name,
                 FileType = pictureApi.FileType,
                 Data = pictureApi.Data,
+                AspNetUser = userRepository.GetAll().FirstOrDefault(u => u.Id == pictureApi.OwnerID),
                 OwnerID = pictureApi.OwnerID,
-                Tags = pictureApi.TagsIds.Select(t => tagRepository.Get(t)).ToList()
+                Tags = pictureApi.TagsIds.Select(t => tagRepository.Find(t)).ToList()
             };
         }
     }
