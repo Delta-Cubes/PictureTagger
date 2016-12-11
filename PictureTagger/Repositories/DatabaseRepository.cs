@@ -1,5 +1,6 @@
 ﻿using PictureTagger.Models;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 
 namespace PictureTagger.Repositories
@@ -14,6 +15,18 @@ namespace PictureTagger.Repositories
 			dbContext = new PictureTaggerContext();
 		}
 
+		private void SafeSaveChanges()
+		{
+			try
+			{
+				dbContext.SaveChanges();
+			}
+			catch (DbEntityValidationException e)
+			{
+				throw e;
+			}
+		}
+
 		public DatabaseRepository(bool isApiController) : this()
 		{
 			dbContext.Configuration.ProxyCreationEnabled = !isApiController;
@@ -23,7 +36,7 @@ namespace PictureTagger.Repositories
 		public void Create(T model)
 		{
 			dbContext.Set<T>().Add(model);
-			dbContext.SaveChanges();
+			SafeSaveChanges();
 		}
 
 		public void Delete(int? id) => Delete(Get(id));
@@ -31,7 +44,7 @@ namespace PictureTagger.Repositories
 		public void Delete(T model)
 		{
 			dbContext.Set<T>().Remove(model);
-			dbContext.SaveChanges();
+			SafeSaveChanges();
 		}
 
 		public void Dispose() => dbContext.Dispose();
@@ -43,7 +56,7 @@ namespace PictureTagger.Repositories
 		public void Update(T model)
 		{
 			dbContext.Entry(model).State = EntityState.Modified;
-			dbContext.SaveChanges();
+			SafeSaveChanges();
 		}
 	}
 }

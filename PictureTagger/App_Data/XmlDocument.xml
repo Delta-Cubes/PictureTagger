@@ -481,5 +481,10 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:PictureTagger.Controllers.TagsController.ResolveTag(PictureTagger.Repositories.IRepository{PictureTagger.Models.Tag},System.String)">
+            <summary>
+            Create a new tag or return the existing one
+            </summary>
+        </member>
     </members>
 </doc>

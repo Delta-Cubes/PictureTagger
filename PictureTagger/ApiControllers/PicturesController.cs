@@ -41,7 +41,7 @@ namespace PictureTagger.ApiControllers
 				PictureID = p.PictureID,
 				Name = p.Name,
 				Base64Data = $"data:image/{p.FileType};base64,{Convert.ToBase64String(p.Data)}",
-				OwnerID = p.AspNetUser.UserName
+				OwnerID = p.OwnerID
 			});
 		}
 
@@ -60,7 +60,7 @@ namespace PictureTagger.ApiControllers
 				PictureID = picture.PictureID,
 				Name = picture.Name,
 				Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
-				OwnerID = picture.AspNetUser.UserName
+				OwnerID = picture.OwnerID
 			};
 
 			return Ok(pictureApi);
@@ -76,14 +76,9 @@ namespace PictureTagger.ApiControllers
 				return (new HttpResponseMessage(HttpStatusCode.NotFound));
 			}
 
-			var pictureRawResponse = new HttpResponseMessage()
-			{
-				Content = new ByteArrayContent(picture.Data)
-			};
-			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
-			{
-
-			};
+			var pictureRawResponse = new HttpResponseMessage();
+			pictureRawResponse.Content = new ByteArrayContent(picture.Data);
+			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline");
 			pictureRawResponse.Content.Headers.ContentType = new MediaTypeHeaderValue($"image/{picture.FileType}");
 			return pictureRawResponse;
 		}

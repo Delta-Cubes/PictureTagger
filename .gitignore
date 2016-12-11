@@ -241,3 +241,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /PictureTagger/Properties/PublishProfiles
+/Comments.txt
+/SSMS Proof.png
