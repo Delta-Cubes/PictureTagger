@@ -1,4 +1,5 @@
 ﻿using PictureTagger.Models;
+using PictureTagger.Models.ViewModels;
 using PictureTagger.Repositories;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,7 @@ namespace PictureTagger.Controllers
 						FileType = f.ContentType,
 						Tags = tags
 							.Split(',')
-							.Select(t => TagsController.ResolveTag(tagRepo, t))
+							.Select(t => ResolveTag(tagRepo, t))
 							.ToList()
 					};
 
@@ -83,6 +84,20 @@ namespace PictureTagger.Controllers
 			return View();
 		}
 
+		private static Tag ResolveTag(IRepository<Tag> repo, string tag)
+		{
+			tag = tag.Trim();
+
+			var resolved = repo
+				.GetAll()
+				.FirstOrDefault(t => t.TagLabel.Equals(tag, StringComparison.OrdinalIgnoreCase));
+
+			return resolved ?? new Tag
+			{
+				TagLabel = tag
+			};
+		}
+
 		// GET: Pictures/Delete/5
 		public ActionResult Delete(int? id)
 		{
@@ -91,7 +106,7 @@ namespace PictureTagger.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 
-			Picture picture = _db.Get(id);
+			Picture picture = _db.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -105,7 +120,7 @@ namespace PictureTagger.Controllers
 		[ValidateAntiForgeryToken]
 		public ActionResult DeleteConfirmed(int id)
 		{
-			Picture picture = _db.Get(id);
+			Picture picture = _db.Find(id);
 			_db.Delete(id);
 			return RedirectToAction("Index");
 		}
@@ -118,7 +133,7 @@ namespace PictureTagger.Controllers
 			{
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
-			Picture picture = _db.Get(id);
+			Picture picture = _db.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -134,7 +149,7 @@ namespace PictureTagger.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 
-			Picture picture = _db.Get(id);
+			Picture picture = _db.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -163,8 +178,8 @@ namespace PictureTagger.Controllers
 		[AllowAnonymous]
 		public ActionResult Index()
 		{
-			var pictures = _db.Get();
-			return View(pictures.ToList());
+			var pictures = _db.GetAll();
+			return View(pictures.ToList().RealCast<PictureView>());
 		}
 
 		protected override void Dispose(bool disposing)

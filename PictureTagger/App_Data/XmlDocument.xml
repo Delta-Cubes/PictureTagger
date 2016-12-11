@@ -481,10 +481,19 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
-        <member name="M:PictureTagger.Controllers.TagsController.ResolveTag(PictureTagger.Repositories.IRepository{PictureTagger.Models.Tag},System.String)">
+        <member name="M:PictureTagger.Extensions.RealCast``1(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
-            Create a new tag or return the existing one
+            Call implicit/explicit cast overloads for each item in a collection.
             </summary>
+            <typeparam name="T">New type to cast to.</typeparam>
+            <param name="collection">Collection of old types.</param>
+        </member>
+        <member name="M:PictureTagger.Extensions.RealCast``1(System.Linq.IQueryable{System.Object})">
+            <summary>
+            Call implicit/explicit cast overloads for each item in a collection.
+            </summary>
+            <typeparam name="T">New type to cast to.</typeparam>
+            <param name="collection">Collection of old types.</param>
         </member>
     </members>
 </doc>

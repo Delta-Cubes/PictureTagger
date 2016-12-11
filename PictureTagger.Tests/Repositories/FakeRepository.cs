@@ -7,33 +7,33 @@ namespace PictureTagger.Tests.Repositories
 {
 	public class FakeRepository<T> : IRepository<T>
 	{
-		private readonly Func<T, int> _entityId;
-		private readonly IDictionary<int, T> _entities;
+		private readonly Func<T, int> GetEntityID;
+		private readonly IDictionary<int, T> FakeEntities;
 
-		public FakeRepository(Func<T, int> entityId)
+		public FakeRepository(Func<T, int> getEntityId)
 		{
-			if (entityId == null) throw new ArgumentNullException(nameof(entityId));
-			_entityId = entityId;
-			_entities = new Dictionary<int, T>();
+			if (getEntityId == null) throw new ArgumentNullException(nameof(getEntityId));
+			GetEntityID = getEntityId;
+			FakeEntities = new Dictionary<int, T>();
 		}
 
-		public void Create(T _model) => _entities.Add(_entityId(_model), _model);
+		public void Create(T _model) => FakeEntities.Add(GetEntityID(_model), _model);
 
-		public void Delete(int? id) => Delete(Get(id));
+		public void Delete(int? id) => Delete(Find(id));
 
-		public void Delete(T model) => _entities.Remove(_entityId(model));
+		public void Delete(T model) => FakeEntities.Remove(GetEntityID(model));
 
-		public void Dispose() => _entities.Clear();
+		public void Dispose() => FakeEntities.Clear();
 
-		public IQueryable<T> Get() => _entities.Values.AsQueryable();
+		public IQueryable<T> GetAll() => FakeEntities.Values.AsQueryable();
 
-		public T Get(int? id)
+		public T Find(int? id)
 		{
 			T obj = default(T);
-			_entities.TryGetValue(id ?? -1, out obj);
+			FakeEntities.TryGetValue(id ?? -1, out obj);
 			return obj;
 		}
 
-		public void Update(T _model) => _entities[_entityId(_model)] = _model;
+		public void Update(T _model) => FakeEntities[GetEntityID(_model)] = _model;
 	}
 }

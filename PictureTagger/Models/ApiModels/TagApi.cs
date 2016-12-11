@@ -9,7 +9,6 @@ namespace PictureTagger.Models.ApiModels
     {
         public int TagID { get; set; }
         public string TagLabel { get; set; }
-        public bool TagSelected { get; set; }
         public virtual ICollection<Int32> PicturesIds { get; set; }
 
         public static implicit operator TagApi(Tag tag)
@@ -17,7 +16,8 @@ namespace PictureTagger.Models.ApiModels
             return new TagApi()
             {
                 TagID = tag.TagID,
-                TagLabel = tag.TagLabel
+                TagLabel = tag.TagLabel,
+                PicturesIds = tag.Pictures.Select(p => p.PictureID).ToList()
             };
         }
     }

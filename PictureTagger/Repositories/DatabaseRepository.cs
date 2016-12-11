@@ -39,7 +39,7 @@ namespace PictureTagger.Repositories
 			SafeSaveChanges();
 		}
 
-		public void Delete(int? id) => Delete(Get(id));
+		public void Delete(int? id) => Delete(Find(id));
 
 		public void Delete(T model)
 		{
@@ -49,9 +49,9 @@ namespace PictureTagger.Repositories
 
 		public void Dispose() => dbContext.Dispose();
 
-		public IQueryable<T> Get() => dbContext.Set<T>();
+		public IQueryable<T> GetAll() => dbContext.Set<T>();
 
-		public T Get(int? id) => dbContext.Set<T>().Find(id);
+		public T Find(int? id) => dbContext.Set<T>().Find(id);
 
 		public void Update(T model)
 		{

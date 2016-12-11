@@ -8,8 +8,8 @@ namespace PictureTagger.Repositories
 {
 	public interface IRepository<T> : IDisposable
 	{
-		IQueryable<T> Get();
-		T Get(int? id);
+		IQueryable<T> GetAll();
+		T Find(int? id);
 		void Create(T model);
 		void Update(T model);
 		void Delete(int? id);

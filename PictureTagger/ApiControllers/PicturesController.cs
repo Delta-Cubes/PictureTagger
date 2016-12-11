@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Microsoft.AspNet.Identity;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
 using PictureTagger.Repositories;
@@ -34,72 +33,67 @@ namespace PictureTagger.ApiControllers
 		}
 
 		// GET: api/Pictures
+		[AllowAnonymous]
 		public IQueryable<PictureApi> GetPictures()
 		{
-			return dbPicturesRepository.Get().Select(p => new PictureApi()
-			{
-				PictureID = p.PictureID,
-				Name = p.Name,
-				Base64Data = $"data:image/{p.FileType};base64,{Convert.ToBase64String(p.Data)}",
-				OwnerID = p.OwnerID
-			});
+			return dbPicturesRepository.GetAll().RealCast<PictureApi>();
 		}
 
 		// GET: api/Pictures/5
+		[AllowAnonymous]
 		[ResponseType(typeof(PictureApi))]
 		public IHttpActionResult GetPicture(int id)
 		{
-			Picture picture = dbPicturesRepository.Get(id);
+			Picture picture = dbPicturesRepository.Find(id);
 			if (picture == null)
 			{
 				return NotFound();
 			}
 
-			PictureApi pictureApi = new PictureApi()
-			{
-				PictureID = picture.PictureID,
-				Name = picture.Name,
-				Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
-				OwnerID = picture.OwnerID
-			};
-
-			return Ok(pictureApi);
+			return Ok(picture);
 		}
 
-		// GET: api/Pictures/5/imgage
+		// GET: api/Pictures/5/
+		[AllowAnonymous]
+		[Route("api/Pictures/{id}/image")]
 		[ResponseType(typeof(Bitmap))]
 		public HttpResponseMessage GetPictureRaw(int id)
 		{
-			Picture picture = dbPicturesRepository.Get(id);
+			Picture picture = dbPicturesRepository.Find(id);
 			if (picture == null)
 			{
 				return (new HttpResponseMessage(HttpStatusCode.NotFound));
 			}
 
-			var pictureRawResponse = new HttpResponseMessage();
-			pictureRawResponse.Content = new ByteArrayContent(picture.Data);
-			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline");
+			var pictureRawResponse = new HttpResponseMessage()
+			{
+				Content = new ByteArrayContent(picture.Data)
+			};
+			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
+			{
+
+			};
 			pictureRawResponse.Content.Headers.ContentType = new MediaTypeHeaderValue($"image/{picture.FileType}");
 			return pictureRawResponse;
 		}
 
 		// PUT: api/Pictures/5
 		[ResponseType(typeof(void))]
-		public IHttpActionResult PutPicture(int id, Picture picture)
+		public IHttpActionResult PutPicture(int id, PictureApi pictureApi)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
 
-			if (id != picture.PictureID)
+			if (id != pictureApi.PictureID)
 			{
 				return BadRequest();
 			}
 
 			try
 			{
-				dbPicturesRepository.Update(picture);
+				dbPicturesRepository.Update(pictureApi);
 			}
 			catch (DbUpdateConcurrencyException)
 			{
@@ -116,8 +110,6 @@ namespace PictureTagger.ApiControllers
 			return StatusCode(HttpStatusCode.NoContent);
 		}
 
-		//TODO Fix Put.
-
 		// POST: api/Pictures
 		[ResponseType(typeof(PictureApi))]
 		public IHttpActionResult PostPicture(PictureApi pictureApi)
@@ -127,39 +119,22 @@ namespace PictureTagger.ApiControllers
 				return BadRequest(ModelState);
 			}
 
-			Picture picture = new Picture()
-			{
-				Name = pictureApi.Name,
-				Data = pictureApi.Data,
-				FileType = pictureApi.FileType,
-				OwnerID = User.Identity.GetUserId(),
-				Tags = dbTagsRepository.Get().Where(t => pictureApi.TagsIds.Contains(t.TagID)).ToList()
-			};
-
-			dbPicturesRepository.Create(picture);
-
-			pictureApi = new PictureApi()
-			{
-				Base64Data = $"data:image/{picture.FileType};base64,{Convert.ToBase64String(picture.Data)}",
-				OwnerID = User.Identity.GetUserName()
-			};
+			dbPicturesRepository.Create(pictureApi);
 
 			return CreatedAtRoute("DefaultApi", new { id = pictureApi.PictureID }, pictureApi);
 		}
 
 		// DELETE: api/Pictures/5
-		[ResponseType(typeof(Picture))]
+		[ResponseType(typeof(PictureApi))]
 		public IHttpActionResult DeletePicture(int id)
 		{
-			Picture picture = dbPicturesRepository.Get(id);
+			Picture picture = dbPicturesRepository.Find(id);
 			if (picture == null)
 			{
 				return NotFound();
 			}
 
-			picture.Tags.Clear();
-
-			dbPicturesRepository.Delete(id);
+			dbPicturesRepository.Delete(picture);
 
 			return Ok(picture);
 		}
@@ -176,7 +151,7 @@ namespace PictureTagger.ApiControllers
 
 		private bool PictureExists(int id)
 		{
-			return dbPicturesRepository.Get().Count(e => e.PictureID == id) > 0;
+			return dbPicturesRepository.GetAll().Count(e => e.PictureID == id) > 0;
 		}
 	}
 }
