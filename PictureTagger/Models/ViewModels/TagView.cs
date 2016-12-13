@@ -18,7 +18,14 @@ namespace PictureTagger.Models.ViewModels
             {
                 TagID = tag.TagID,
                 TagLabel = tag.TagLabel,
-                Pictures = tag.Pictures.RealCast<PictureView>().ToList()
+                Pictures = tag.Pictures.Select(p => new PictureView() {
+                    PictureID = p.PictureID,
+                    Name = p.Name,
+                    Hash = p.Hash,
+                    ThumbnailData = p.ThumbnailData,
+                    ThumbnailBase64Data = $"data:image/jpeg;base64,{Convert.ToBase64String(p.ThumbnailData)}",
+                    OwnerID = p.OwnerID,
+                }).ToList()
             };
         }
     }

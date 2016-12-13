@@ -12,14 +12,9 @@
 <table class="table">
 	<tr>
 		<th>
-			@Html.DisplayNameFor(model => model.OwnerID)
-		</th>
-		<th>
-			Image
-		</th>
-		<th>
 			@Html.DisplayNameFor(model => model.Name)
 		</th>
+        <th>Image</th>
 		<th></th>
 	</tr>
 
@@ -27,14 +22,11 @@
 	{
 		<tr>
 			<td>
-				@Html.DisplayFor(modelItem => item.OwnerID)
-			</td>
-			<td>
-				<img src="@item.Base64Data" alt="@item.Name" style="max-width:100%; max-height:300px"/>
-			</td>
-			<td>
 				@Html.DisplayFor(modelItem => item.Name)
 			</td>
+            <td>
+                <img src="@Html.DisplayFor(modelItem => item.ThumbnailBase64Data)" alt="@Html.DisplayFor(modelItem => item.Name)" style="max-width:100%; max-height:300px" />
+            </td>
 			<td>
                 @Html.ActionLink("Details", "Details", new { id = item.PictureID }) |
 				@Html.ActionLink("Edit", "Edit", new { id = item.PictureID }) |

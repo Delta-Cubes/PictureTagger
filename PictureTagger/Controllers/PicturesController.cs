@@ -8,10 +8,10 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 
 namespace PictureTagger.Controllers
 {
@@ -39,52 +39,50 @@ namespace PictureTagger.Controllers
 		[ValidateAntiForgeryToken]
 		public ActionResult Create(HttpPostedFileBase fileBase, string tags)
 		{
-			var claims = HttpContext.User.GetClaims();
-			var ownerId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+			var ownerId = User.Identity.GetUserId();
 
-			if (ownerId == null) return View();
-
-			if (ModelState.IsValid)
+            if (ModelState.IsValid)
 			{
-				var tagRepo = new DatabaseRepository<Tag>(false);
+                using (var tagRepo = new DatabaseRepository<Tag>(false))
+                {
+                    // Handle multiple files
+                    foreach (string key in Request.Files)
+                    {
+                        if (Request.Files[key]?.ContentLength == 0) continue;
 
-				// Handle multiple files
-				foreach (string key in Request.Files)
-				{
-					if (Request.Files[key]?.ContentLength == 0) continue;
+                        // Get file object
+                        var f = Request.Files[key] as HttpPostedFileBase;
 
-					// Get file object
-					var f = Request.Files[key] as HttpPostedFileBase;
+                        // Save image locally with hash as the filename
+                        string hash;
+                        using (var sha1 = new SHA1CryptoServiceProvider())
+                        {
+                            hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
+                        }
 
-					// Save image locally with hash as the filename
-					string hash;
-					using (var sha1 = new SHA1CryptoServiceProvider())
-					{
-						hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
-					}
+                        var filename = Server.MapPath(@"~\UserData\");
 
-					var filename = Server.MapPath(@"~\UserData\");
+                        // Save to UserData folder
+                        Directory.CreateDirectory(filename);
+                        f.SaveAs(filename + hash);
 
-					// Save to UserData folder
-					Directory.CreateDirectory(filename);
-					f.SaveAs(filename + hash);
+                        // Create a new Picture from the file
+                        var picture = new Picture
+                        {
+                            OwnerID = ownerId,
+                            Name = f.FileName,
+                            Hash = hash,
+                            ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
+                            Tags = tags
+                                .Split(',')
+                                .Select(t => ResolveTag(tagRepo, t))
+                                .ToList()
+                        };
 
-					// Create a new Picture from the file
-					var picture = new Picture
-					{
-						OwnerID = ownerId,
-						Name = f.FileName,
-						Hash = hash,
-						ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
-						Tags = tags
-							.Split(',')
-							.Select(t => ResolveTag(tagRepo, t))
-							.ToList()
-					};
-
-					// Add the picture
-					_db.Create(picture);
-				}
+                        // Add the picture
+                        _db.Create(picture);
+                    }
+                }
 
 				return RedirectToAction("Index");
 			}
@@ -120,7 +118,7 @@ namespace PictureTagger.Controllers
 				return HttpNotFound();
 			}
 
-			return View(picture);
+			return View((PictureView)picture);
 		}
 
 		// POST: Pictures/Delete/5
@@ -146,7 +144,7 @@ namespace PictureTagger.Controllers
 			{
 				return HttpNotFound();
 			}
-			return View(picture);
+			return View((PictureView)picture);
 		}
 
 		// GET: Pictures/Edit/5
@@ -163,7 +161,7 @@ namespace PictureTagger.Controllers
 				return HttpNotFound();
 			}
 
-			return View(picture);
+			return View((PictureView)picture);
 		}
 
 		// POST: Pictures/Edit/5
@@ -179,7 +177,7 @@ namespace PictureTagger.Controllers
 				return RedirectToAction("Index");
 			}
 
-			return View(picture);
+			return View((PictureView)picture);
 		}
 
 		// GET: Pictures

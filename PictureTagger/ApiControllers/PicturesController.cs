@@ -13,6 +13,7 @@ using System.Web.Http.Description;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
 using PictureTagger.Repositories;
+using Microsoft.AspNet.Identity;
 
 namespace PictureTagger.ApiControllers
 {
@@ -53,30 +54,6 @@ namespace PictureTagger.ApiControllers
 			return Ok(picture);
 		}
 
-		// GET: api/Pictures/5/
-		[AllowAnonymous]
-		[Route("api/Pictures/{id}/thumbnail")]
-		[ResponseType(typeof(Bitmap))]
-		public HttpResponseMessage GetThumbnailRaw(int id)
-		{
-			Picture picture = _dbPictures.Find(id);
-			if (picture == null)
-			{
-				return (new HttpResponseMessage(HttpStatusCode.NotFound));
-			}
-
-			var pictureRawResponse = new HttpResponseMessage()
-			{
-				Content = new ByteArrayContent(picture.ThumbnailData)
-			};
-			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
-			{
-
-			};
-			pictureRawResponse.Content.Headers.ContentType = new MediaTypeHeaderValue($"image/jpeg");
-			return pictureRawResponse;
-		}
-
 		// PUT: api/Pictures/5
 		[ResponseType(typeof(void))]
 		public IHttpActionResult PutPicture(int id, PictureApi pictureApi)
@@ -93,7 +70,7 @@ namespace PictureTagger.ApiControllers
 
 			try
 			{
-				_dbPictures.Update(pictureApi);
+				_dbPictures.Update((Picture)pictureApi);
 			}
 			catch (DbUpdateConcurrencyException)
 			{
@@ -118,8 +95,10 @@ namespace PictureTagger.ApiControllers
 			{
 				return BadRequest(ModelState);
 			}
+            
+            pictureApi.OwnerID = User.Identity.GetUserId();
 
-			_dbPictures.Create(pictureApi);
+			_dbPictures.Create((Picture)pictureApi);
 
 			return CreatedAtRoute("DefaultApi", new { id = pictureApi.PictureID }, pictureApi);
 		}
@@ -134,7 +113,7 @@ namespace PictureTagger.ApiControllers
 				return NotFound();
 			}
 
-			_dbPictures.Delete(picture);
+			_dbPictures.Delete((Picture)picture);
 
 			return Ok(picture);
 		}

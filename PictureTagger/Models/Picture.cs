@@ -36,7 +36,8 @@ namespace PictureTagger.Models
 			{
 				PictureID = pictureView.PictureID,
 				Name = pictureView.Name,
-				ThumbnailData = pictureView.Data,
+                Hash = pictureView.Hash,
+				ThumbnailData = pictureView.ThumbnailData,
 				OwnerID = pictureView.OwnerID,
 				Tags = pictureView.Tags.Select(t => tagRepository.Find(t.TagID)).ToList()
 			};
@@ -48,7 +49,8 @@ namespace PictureTagger.Models
 			{
 				PictureID = pictureApi.PictureID,
 				Name = pictureApi.Name,
-				ThumbnailData = pictureApi.Data,
+                Hash = pictureApi.Hash,
+				ThumbnailData = pictureApi.ThumbnailData,
 				OwnerID = pictureApi.OwnerID,
 				Tags = pictureApi.TagsIds.Select(t => tagRepository.Find(t)).ToList()
 			};
