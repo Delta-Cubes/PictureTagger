@@ -17,6 +17,7 @@
         <th>
             @Html.DisplayNameFor(model => model.Name)
         </th>
+        <th>@Html.DisplayNameFor(model => model.Tags)</th>
     </tr>
 
     <tr>
@@ -24,15 +25,18 @@
             @Html.DisplayFor(model => model.OwnerID)
         </td>
         <td>
-            <img src="@@Html.DisplayFor(model => model.Base64Data)" alt="@Html.DisplayFor(model => model.Name)" style="max-width:100%; max-height:300px" />
+            <img src="@Html.DisplayFor(model => model.Base64Data)" alt="@Html.DisplayFor(model => model.Name)" style="max-width:100%; max-height:300px" />
         </td>
         <td>
             @Html.DisplayFor(model => model.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Tags)
         </td>
     </tr>
 
 </table>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = model.PictureID }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PictureID }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
