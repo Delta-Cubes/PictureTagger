@@ -220,6 +220,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\ThumbnailGenerator.cs" />
     <Compile Include="Migrations\201612112214553_Initial.cs" />
     <Compile Include="Migrations\201612112214553_Initial.Designer.cs">
       <DependentUpon>201612112214553_Initial.cs</DependentUpon>
@@ -227,6 +228,10 @@
     <Compile Include="Migrations\201612112307350_LongerFields.cs" />
     <Compile Include="Migrations\201612112307350_LongerFields.Designer.cs">
       <DependentUpon>201612112307350_LongerFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612130101423_Thumbnails.cs" />
+    <Compile Include="Migrations\201612130101423_Thumbnails.Designer.cs">
+      <DependentUpon>201612130101423_Thumbnails.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -365,6 +370,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612112307350_LongerFields.resx">
       <DependentUpon>201612112307350_LongerFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612130101423_Thumbnails.resx">
+      <DependentUpon>201612130101423_Thumbnails.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

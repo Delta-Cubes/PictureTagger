@@ -2,24 +2,31 @@
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System;
 
 namespace PictureTagger.Repositories
 {
 	public class DatabaseRepository<T> : IRepository<T>
 		where T : class
 	{
-		protected PictureTaggerContext dbContext;
+		private PictureTaggerContext _db;
 
-		public DatabaseRepository()
+		/// <summary>
+		/// Create a new database connection.
+		/// </summary>
+		/// <param name="proxy">Allow Entity Framework to proxy loaded objects?</param>
+		public DatabaseRepository(bool proxy = true)
 		{
-			dbContext = new PictureTaggerContext();
+			_db = new PictureTaggerContext();
+			_db.Configuration.ProxyCreationEnabled = proxy;
+			_db.Configuration.LazyLoadingEnabled = proxy;
 		}
 
 		private void SafeSaveChanges()
 		{
 			try
 			{
-				dbContext.SaveChanges();
+				_db.SaveChanges();
 			}
 			catch (DbEntityValidationException e)
 			{
@@ -27,15 +34,9 @@ namespace PictureTagger.Repositories
 			}
 		}
 
-		public DatabaseRepository(bool isApiController) : this()
-		{
-			dbContext.Configuration.ProxyCreationEnabled = !isApiController;
-			dbContext.Configuration.LazyLoadingEnabled = !isApiController;
-		}
-
 		public void Create(T model)
 		{
-			dbContext.Set<T>().Add(model);
+			_db.Set<T>().Add(model);
 			SafeSaveChanges();
 		}
 
@@ -43,19 +44,19 @@ namespace PictureTagger.Repositories
 
 		public void Delete(T model)
 		{
-			dbContext.Set<T>().Remove(model);
+			_db.Set<T>().Remove(model);
 			SafeSaveChanges();
 		}
 
-		public void Dispose() => dbContext.Dispose();
+		public void Dispose() => _db.Dispose();
 
-		public IQueryable<T> GetAll() => dbContext.Set<T>();
+		public IQueryable<T> GetAll() => _db.Set<T>();
 
-		public T Find(int? id) => dbContext.Set<T>().Find(id);
+		public T Find(int? id) => _db.Set<T>().Find(id);
 
 		public void Update(T model)
 		{
-			dbContext.Entry(model).State = EntityState.Modified;
+			_db.Entry(model).State = EntityState.Modified;
 			SafeSaveChanges();
 		}
 	}

@@ -22,7 +22,7 @@ namespace PictureTagger.ApiControllers
 		private IRepository<Picture> dbPicturesRepository;
 		private IRepository<Tag> dbTagsRepository;
 
-		public PicturesController() : this(new DatabaseRepository<Picture>(true), new DatabaseRepository<Tag>(true))
+		public PicturesController() : this(new DatabaseRepository<Picture>(false), new DatabaseRepository<Tag>(false))
 		{
 		}
 
@@ -55,9 +55,9 @@ namespace PictureTagger.ApiControllers
 
 		// GET: api/Pictures/5/
 		[AllowAnonymous]
-		[Route("api/Pictures/{id}/image")]
+		[Route("api/Pictures/{id}/thumbnail")]
 		[ResponseType(typeof(Bitmap))]
-		public HttpResponseMessage GetPictureRaw(int id)
+		public HttpResponseMessage GetThumbnailRaw(int id)
 		{
 			Picture picture = dbPicturesRepository.Find(id);
 			if (picture == null)
@@ -67,13 +67,13 @@ namespace PictureTagger.ApiControllers
 
 			var pictureRawResponse = new HttpResponseMessage()
 			{
-				Content = new ByteArrayContent(picture.Data)
+				Content = new ByteArrayContent(picture.ThumbnailData)
 			};
 			pictureRawResponse.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
 			{
 
 			};
-			pictureRawResponse.Content.Headers.ContentType = new MediaTypeHeaderValue($"image/{picture.FileType}");
+			pictureRawResponse.Content.Headers.ContentType = new MediaTypeHeaderValue($"image/jpeg");
 			return pictureRawResponse;
 		}
 

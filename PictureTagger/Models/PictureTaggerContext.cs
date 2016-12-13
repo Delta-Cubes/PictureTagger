@@ -15,10 +15,6 @@ namespace PictureTagger.Models
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Picture>()
-				.Property(e => e.FileType)
-				.IsUnicode(false);
-
-			modelBuilder.Entity<Picture>()
 				.Property(e => e.Name)
 				.IsUnicode(false);
 

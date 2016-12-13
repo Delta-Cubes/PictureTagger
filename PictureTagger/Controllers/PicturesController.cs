@@ -1,4 +1,5 @@
-﻿using PictureTagger.Models;
+﻿using PictureTagger.Infrastructure;
+using PictureTagger.Models;
 using PictureTagger.Models.ViewModels;
 using PictureTagger.Repositories;
 using System;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 
@@ -44,7 +46,7 @@ namespace PictureTagger.Controllers
 
 			if (ModelState.IsValid)
 			{
-				var tagRepo = new DatabaseRepository<Tag>();
+				var tagRepo = new DatabaseRepository<Tag>(false);
 
 				// Handle multiple files
 				foreach (string key in Request.Files)
@@ -54,20 +56,26 @@ namespace PictureTagger.Controllers
 					// Get file object
 					var f = Request.Files[key] as HttpPostedFileBase;
 
-					// Get binary data from file
-					byte[] buffer = new byte[f.ContentLength];
-					using (var reader = new BinaryReader(f.InputStream))
+					// Save image locally with hash as the filename
+					string hash;
+					using (var sha1 = new SHA1CryptoServiceProvider())
 					{
-						buffer = reader.ReadBytes(f.ContentLength);
+						hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
 					}
+
+					var filename = Server.MapPath(@"~\UserData\");
+
+					// Save to UserData folder
+					Directory.CreateDirectory(filename);
+					f.SaveAs(filename + hash);
 
 					// Create a new Picture from the file
 					var picture = new Picture
 					{
 						OwnerID = ownerId,
 						Name = f.FileName,
-						Data = buffer,
-						FileType = f.ContentType,
+						Hash = hash,
+						ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
 						Tags = tags
 							.Split(',')
 							.Select(t => ResolveTag(tagRepo, t))

@@ -495,5 +495,17 @@
             <typeparam name="T">New type to cast to.</typeparam>
             <param name="collection">Collection of old types.</param>
         </member>
+        <member name="M:PictureTagger.Infrastructure.ThumbnailGenerator.Generate(System.IO.Stream)">
+            <summary>
+            Returns a small, low-quality JPEG of an image.
+            </summary>
+            <param name="data">Image data to resize.</param>
+        </member>
+        <member name="M:PictureTagger.Repositories.DatabaseRepository`1.#ctor(System.Boolean)">
+            <summary>
+            Create a new database connection.
+            </summary>
+            <param name="proxy">Allow Entity Framework to proxy loaded objects?</param>
+        </member>
     </members>
 </doc>
