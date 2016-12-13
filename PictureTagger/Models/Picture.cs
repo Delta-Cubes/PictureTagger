@@ -38,7 +38,7 @@ namespace PictureTagger.Models
 				Name = pictureView.Name,
 				ThumbnailData = pictureView.Data,
 				OwnerID = pictureView.OwnerID,
-				Tags = pictureView.TagsIds.Select(t => tagRepository.Find(t)).ToList()
+				Tags = pictureView.Tags.Select(t => tagRepository.Find(t.TagID)).ToList()
 			};
 		}
 

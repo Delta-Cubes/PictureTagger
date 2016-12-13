@@ -13,7 +13,7 @@ namespace PictureTagger.Models.ViewModels
 		public string Base64Data { get; set; }
 		public string FileType { get; set; }
 		public string Name { get; set; }
-		public virtual ICollection<int> TagsIds { get; set; }
+		public virtual ICollection<TagView> Tags { get; set; }
 
 		public static implicit operator PictureView(Picture picture)
 		{
@@ -24,7 +24,7 @@ namespace PictureTagger.Models.ViewModels
 				Data = picture.ThumbnailData,
 				Base64Data = $"data:image/jpeg;base64,{Convert.ToBase64String(picture.ThumbnailData)}",
 				OwnerID = picture.OwnerID,
-				TagsIds = picture.Tags.Select(t => t.TagID).ToList()
+                Tags = picture.Tags.RealCast<TagView>().ToList()
 			};
 		}
 	}

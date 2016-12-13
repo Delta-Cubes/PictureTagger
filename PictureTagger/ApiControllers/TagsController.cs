@@ -13,22 +13,22 @@ namespace PictureTagger.ApiControllers
 	[Authorize]
     public class TagsController : ApiController
     {
-        private IRepository<Tag> dbTagsRepository;
+        private IRepository<Tag> _db;
 
         public TagsController() : this(new DatabaseRepository<Tag>(false))
         {
         }
 
-        public TagsController(IRepository<Tag> dbTagsRepository)
+        public TagsController(IRepository<Tag> db)
         {
-            this.dbTagsRepository = dbTagsRepository;
+            this._db = db;
         }
 
         // GET: api/Tags
         [AllowAnonymous]
         public IQueryable<TagApi> GetTags()
         {
-            return dbTagsRepository.GetAll().RealCast<TagApi>();
+            return _db.GetAll().RealCast<TagApi>();
         }
 
         // GET: api/Tags/5
@@ -36,7 +36,7 @@ namespace PictureTagger.ApiControllers
         [ResponseType(typeof(TagApi))]
         public IHttpActionResult GetTag(int id)
         {
-            Tag tag = dbTagsRepository.Find(id);
+            Tag tag = _db.Find(id);
             if (tag == null)
             {
                 return NotFound();
@@ -49,7 +49,7 @@ namespace PictureTagger.ApiControllers
         [Route("api/Tags/Suggestions")]
         public IQueryable<TagApi> Suggestions(string partialTag)
         {
-            return dbTagsRepository.GetAll().Where(t => t.TagLabel.Contains(partialTag)).RealCast<TagApi>();
+            return _db.GetAll().Where(t => t.TagLabel.Contains(partialTag)).RealCast<TagApi>();
         }
 
         // PUT: api/Tags/5
@@ -68,7 +68,7 @@ namespace PictureTagger.ApiControllers
 
             try
             {
-                dbTagsRepository.Update(tagApi);
+                _db.Update(tagApi);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -94,7 +94,7 @@ namespace PictureTagger.ApiControllers
                 return BadRequest(ModelState);
             }
 
-            dbTagsRepository.Create(tagApi);
+            _db.Create(tagApi);
 
             return CreatedAtRoute("DefaultApi", new { id = tagApi.TagID }, tagApi);
         }
@@ -103,13 +103,13 @@ namespace PictureTagger.ApiControllers
         [ResponseType(typeof(Tag))]
         public IHttpActionResult DeleteTag(int id)
         {
-            Tag tag = dbTagsRepository.Find(id);
+            Tag tag = _db.Find(id);
             if (tag == null)
             {
                 return NotFound();
             }
 
-            dbTagsRepository.Delete(tag);
+            _db.Delete(tag);
 
             return Ok(tag);
         }
@@ -118,14 +118,14 @@ namespace PictureTagger.ApiControllers
         {
             if (disposing)
             {
-                dbTagsRepository.Dispose();
+                _db.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool TagExists(int id)
         {
-            return dbTagsRepository.GetAll().Count(e => e.TagID == id) > 0;
+            return _db.GetAll().Count(e => e.TagID == id) > 0;
         }
     }
 }

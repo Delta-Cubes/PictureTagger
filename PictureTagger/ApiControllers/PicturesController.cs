@@ -19,24 +19,24 @@ namespace PictureTagger.ApiControllers
 	[Authorize]
 	public class PicturesController : ApiController
 	{
-		private IRepository<Picture> dbPicturesRepository;
-		private IRepository<Tag> dbTagsRepository;
+		private IRepository<Picture> _dbPictures;
+		private IRepository<Tag> _dbTags;
 
 		public PicturesController() : this(new DatabaseRepository<Picture>(false), new DatabaseRepository<Tag>(false))
 		{
 		}
 
-		public PicturesController(IRepository<Picture> dbPicturesRepository, IRepository<Tag> dbTagsRepository)
+		public PicturesController(IRepository<Picture> dbPictures, IRepository<Tag> dbTags)
 		{
-			this.dbPicturesRepository = dbPicturesRepository;
-			this.dbTagsRepository = dbTagsRepository;
+			this._dbPictures = dbPictures;
+			this._dbTags = dbTags;
 		}
 
 		// GET: api/Pictures
 		[AllowAnonymous]
 		public IQueryable<PictureApi> GetPictures()
 		{
-			return dbPicturesRepository.GetAll().RealCast<PictureApi>();
+			return _dbPictures.GetAll().RealCast<PictureApi>();
 		}
 
 		// GET: api/Pictures/5
@@ -44,7 +44,7 @@ namespace PictureTagger.ApiControllers
 		[ResponseType(typeof(PictureApi))]
 		public IHttpActionResult GetPicture(int id)
 		{
-			Picture picture = dbPicturesRepository.Find(id);
+			Picture picture = _dbPictures.Find(id);
 			if (picture == null)
 			{
 				return NotFound();
@@ -59,7 +59,7 @@ namespace PictureTagger.ApiControllers
 		[ResponseType(typeof(Bitmap))]
 		public HttpResponseMessage GetThumbnailRaw(int id)
 		{
-			Picture picture = dbPicturesRepository.Find(id);
+			Picture picture = _dbPictures.Find(id);
 			if (picture == null)
 			{
 				return (new HttpResponseMessage(HttpStatusCode.NotFound));
@@ -93,7 +93,7 @@ namespace PictureTagger.ApiControllers
 
 			try
 			{
-				dbPicturesRepository.Update(pictureApi);
+				_dbPictures.Update(pictureApi);
 			}
 			catch (DbUpdateConcurrencyException)
 			{
@@ -119,7 +119,7 @@ namespace PictureTagger.ApiControllers
 				return BadRequest(ModelState);
 			}
 
-			dbPicturesRepository.Create(pictureApi);
+			_dbPictures.Create(pictureApi);
 
 			return CreatedAtRoute("DefaultApi", new { id = pictureApi.PictureID }, pictureApi);
 		}
@@ -128,13 +128,13 @@ namespace PictureTagger.ApiControllers
 		[ResponseType(typeof(PictureApi))]
 		public IHttpActionResult DeletePicture(int id)
 		{
-			Picture picture = dbPicturesRepository.Find(id);
+			Picture picture = _dbPictures.Find(id);
 			if (picture == null)
 			{
 				return NotFound();
 			}
 
-			dbPicturesRepository.Delete(picture);
+			_dbPictures.Delete(picture);
 
 			return Ok(picture);
 		}
@@ -143,15 +143,15 @@ namespace PictureTagger.ApiControllers
 		{
 			if (disposing)
 			{
-				dbPicturesRepository.Dispose();
-				dbTagsRepository.Dispose();
+				_dbPictures.Dispose();
+				_dbTags.Dispose();
 			}
 			base.Dispose(disposing);
 		}
 
 		private bool PictureExists(int id)
 		{
-			return dbPicturesRepository.GetAll().Count(e => e.PictureID == id) > 0;
+			return _dbPictures.GetAll().Count(e => e.PictureID == id) > 0;
 		}
 	}
 }
