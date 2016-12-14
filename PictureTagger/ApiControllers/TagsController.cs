@@ -46,7 +46,7 @@ namespace PictureTagger.ApiControllers
         }
 
         [AllowAnonymous]
-        [Route("api/Tags/Suggestions")]
+        [Route("api/Tags/Suggestions/{partialTag}")]
         public IQueryable<TagApi> Suggestions(string partialTag)
         {
             return _db.GetAll().Where(t => t.TagLabel.Contains(partialTag)).RealCast<TagApi>();
