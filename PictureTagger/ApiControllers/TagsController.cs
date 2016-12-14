@@ -25,10 +25,11 @@ namespace PictureTagger.ApiControllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         [Route("api/Tags/Suggestions/{partialTag}")]
         public IQueryable<TagApi> Suggestions(string partialTag)
         {
-            return _db.GetAll().Where(t => t.TagLabel.Contains(partialTag)).RealCast<TagApi>();
+            return _db.GetAll().ToList().RealCast<TagApi>().AsQueryable().Where(t => t.TagLabel.Contains(partialTag));
         }
 
         protected override void Dispose(bool disposing)
