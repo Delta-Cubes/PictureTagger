@@ -28,8 +28,32 @@ namespace PictureTagger.Controllers
 			_db = db;
 		}
 
-		// GET: Pictures/Create
-		public ActionResult Create()
+        // GET: Pictures
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            var pictures = _db.GetAll();
+            return View(pictures.ToList().RealCast<PictureView>());
+        }
+
+        // GET: Pictures/Details/5
+        [AllowAnonymous]
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Picture picture = _db.Find(id);
+            if (picture == null)
+            {
+                return HttpNotFound();
+            }
+            return View((PictureView)picture);
+        }
+
+        // GET: Pictures/Create
+        public ActionResult Create()
 		{
 			return View();
 		}
@@ -115,49 +139,6 @@ namespace PictureTagger.Controllers
 				.ToList();
 		}
 
-		// GET: Pictures/Delete/5
-		public ActionResult Delete(int? id)
-		{
-			if (id == null)
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
-
-			Picture picture = _db.Find(id);
-			if (picture == null)
-			{
-				return HttpNotFound();
-			}
-
-			return View((PictureView)picture);
-		}
-
-		// POST: Pictures/Delete/5
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public ActionResult DeleteConfirmed(int id)
-		{
-			Picture picture = _db.Find(id);
-			_db.Delete(id);
-			return RedirectToAction("Index");
-		}
-
-		// GET: Pictures/Details/5
-		[AllowAnonymous]
-		public ActionResult Details(int? id)
-		{
-			if (id == null)
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
-			Picture picture = _db.Find(id);
-			if (picture == null)
-			{
-				return HttpNotFound();
-			}
-			return View((PictureView)picture);
-		}
-
 		// GET: Pictures/Edit/5
 		public ActionResult Edit(int? id)
 		{
@@ -172,7 +153,11 @@ namespace PictureTagger.Controllers
 				return HttpNotFound();
 			}
 
-			return View((PictureView)picture);
+            if (picture.OwnerID != User.Identity.GetUserId()) {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+
+            return View((PictureView)picture);
 		}
 
 		// POST: Pictures/Edit/5
@@ -184,27 +169,61 @@ namespace PictureTagger.Controllers
 		{
 			Picture picture = _db.Find(pictureView.PictureID);
 
-			if (ModelState.IsValid)
+            if (picture.OwnerID != User.Identity.GetUserId()) {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+
+            if (ModelState.IsValid)
 			{
-				var tagRepo = new DatabaseRepository<Tag>(false);
-				picture.Tags.Clear();
-				picture.Tags = ResolveTags(tagRepo, tags);
-				_db.Update(picture);
-				return RedirectToAction("Index");
+                using (var tagRepo = new DatabaseRepository<Tag>(false))
+                {
+                    picture.Tags.Clear();
+                    picture.Tags = ResolveTags(tagRepo, tags);
+                    _db.Update(picture);
+                }
+                return RedirectToAction("Index");
 			}
 
 			return View((PictureView)picture);
 		}
 
-		// GET: Pictures
-		[AllowAnonymous]
-		public ActionResult Index()
-		{
-			var pictures = _db.GetAll();
-			return View(pictures.ToList().RealCast<PictureView>());
-		}
+        // GET: Pictures/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
-		protected override void Dispose(bool disposing)
+            Picture picture = _db.Find(id);
+            if (picture == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (picture.OwnerID != User.Identity.GetUserId())
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+
+            return View((PictureView)picture);
+        }
+
+        // POST: Pictures/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            Picture picture = _db.Find(id);
+            if (picture.OwnerID != User.Identity.GetUserId())
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+            _db.Delete(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
