@@ -24,6 +24,26 @@ namespace PictureTagger.ApiControllers
             this._db = db;
         }
 
+        // GET: api/Tags
+        [AllowAnonymous]
+        public IQueryable<TagApi> GetTags()
+        {
+            return _db.GetAll().ToList().RealCast<TagApi>().AsQueryable();
+        }
+
+        // GET: api/Tags/5
+        [AllowAnonymous]
+        [ResponseType(typeof(PictureApi))]
+        public IHttpActionResult GetTag(int id)
+        {
+            Tag tag = _db.Find(id);
+            if(tag == null)
+            {
+                return NotFound();
+            }
+            return Ok((TagApi)tag);
+        }
+
         [AllowAnonymous]
         [HttpGet]
         [Route("api/Tags/Suggestions/{partialTag}")]
