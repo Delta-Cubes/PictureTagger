@@ -32,8 +32,7 @@ namespace PictureTagger.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            var pictures = _db.GetAll();
-            return View(pictures.ToList().RealCast<PictureView>());
+            return View(_db.GetAll().ToList().RealCast<PictureView>());
         }
 
         // GET: Pictures/Details/5

@@ -29,7 +29,7 @@ namespace PictureTagger.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View(_db.GetAll().RealCast<TagView>().ToList());
+            return View(_db.GetAll().ToList().RealCast<TagView>());
         }
 
         // GET: Tags/Details/5
