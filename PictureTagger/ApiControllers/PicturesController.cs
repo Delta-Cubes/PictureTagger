@@ -17,120 +17,53 @@ using Microsoft.AspNet.Identity;
 
 namespace PictureTagger.ApiControllers
 {
-	[Authorize]
-	public class PicturesController : ApiController
-	{
-		private IRepository<Picture> _dbPictures;
-		private IRepository<Tag> _dbTags;
+    [Authorize]
+    public class PicturesController : ApiController
+    {
+        private IRepository<Picture> _db;
 
-		public PicturesController() : this(new DatabaseRepository<Picture>(false), new DatabaseRepository<Tag>(false))
-		{
-		}
+        public PicturesController() : this(new DatabaseRepository<Picture>(true))
+        {
+        }
 
-		public PicturesController(IRepository<Picture> dbPictures, IRepository<Tag> dbTags)
-		{
-			this._dbPictures = dbPictures;
-			this._dbTags = dbTags;
-		}
+        public PicturesController(IRepository<Picture> dbPictures)
+        {
+            this._db = dbPictures;
+        }
 
-		// GET: api/Pictures
-		[AllowAnonymous]
-		public IQueryable<PictureApi> GetPictures()
-		{
-			return _dbPictures.GetAll().RealCast<PictureApi>();
-		}
+        // GET: api/Pictures
+        [AllowAnonymous]
+        public IQueryable<PictureApi> GetPictures()
+        {
+            return _db.GetAll().ToList().RealCast<PictureApi>().AsQueryable();
+        }
 
-		// GET: api/Pictures/5
-		[AllowAnonymous]
-		[ResponseType(typeof(PictureApi))]
-		public IHttpActionResult GetPicture(int id)
-		{
-			Picture picture = _dbPictures.Find(id);
-			if (picture == null)
-			{
-				return NotFound();
-			}
+        // GET: api/Pictures/5
+        [AllowAnonymous]
+        [ResponseType(typeof(PictureApi))]
+        public IHttpActionResult GetPicture(int id)
+        {
+            Picture picture = _db.Find(id);
+            if (picture == null)
+            {
+                return NotFound();
+            }
 
-			return Ok(picture);
-		}
+            return Ok((PictureApi)picture);
+        }
 
-		// PUT: api/Pictures/5
-		[ResponseType(typeof(void))]
-		public IHttpActionResult PutPicture(int id, PictureApi pictureApi)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
-			if (id != pictureApi.PictureID)
-			{
-				return BadRequest();
-			}
-
-			try
-			{
-				_dbPictures.Update((Picture)pictureApi);
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!PictureExists(id))
-				{
-					return NotFound();
-				}
-				else
-				{
-					throw;
-				}
-			}
-
-			return StatusCode(HttpStatusCode.NoContent);
-		}
-
-		// POST: api/Pictures
-		[ResponseType(typeof(PictureApi))]
-		public IHttpActionResult PostPicture(PictureApi pictureApi)
-		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-            
-            pictureApi.OwnerID = User.Identity.GetUserId();
-
-			_dbPictures.Create((Picture)pictureApi);
-
-			return CreatedAtRoute("DefaultApi", new { id = pictureApi.PictureID }, pictureApi);
-		}
-
-		// DELETE: api/Pictures/5
-		[ResponseType(typeof(PictureApi))]
-		public IHttpActionResult DeletePicture(int id)
-		{
-			Picture picture = _dbPictures.Find(id);
-			if (picture == null)
-			{
-				return NotFound();
-			}
-
-			_dbPictures.Delete((Picture)picture);
-
-			return Ok(picture);
-		}
-
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				_dbPictures.Dispose();
-				_dbTags.Dispose();
-			}
-			base.Dispose(disposing);
-		}
-
-		private bool PictureExists(int id)
-		{
-			return _dbPictures.GetAll().Count(e => e.PictureID == id) > 0;
-		}
-	}
+        private bool PictureExists(int id)
+        {
+            return _db.GetAll().Count(e => e.PictureID == id) > 0;
+        }
+    }
 }

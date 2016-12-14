@@ -40,7 +40,7 @@ namespace PictureTagger.Repositories
 			SafeSaveChanges();
 		}
 
-		public void Delete(int? id) => Delete(Find(id));
+		public void Delete(params object[] keyValues) => Delete(Find(keyValues));
 
 		public void Delete(T model)
 		{
@@ -52,7 +52,7 @@ namespace PictureTagger.Repositories
 
 		public IQueryable<T> GetAll() => _db.Set<T>();
 
-		public T Find(int? id) => _db.Set<T>().Find(id);
+		public T Find(params object[] keyValues) => _db.Set<T>().Find(keyValues);
 
 		public void Update(T model)
 		{

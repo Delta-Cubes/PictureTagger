@@ -30,6 +30,29 @@ namespace PictureTagger.Controllers
 			_tagRepo = tagRepo;
 		}
 
+		// GET: Pictures
+		[AllowAnonymous]
+		public ActionResult Index()
+		{
+			return View(_pictureRepo.GetAll().ToList().RealCast<PictureView>());
+		}
+
+		// GET: Pictures/Details/5
+		[AllowAnonymous]
+		public ActionResult Details(int? id)
+		{
+			if (id == null)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+			Picture picture = _pictureRepo.Find(id);
+			if (picture == null)
+			{
+				return HttpNotFound();
+			}
+			return View((PictureView)picture);
+		}
+
 		// GET: Pictures/Create
 		public ActionResult Create()
 		{
@@ -45,45 +68,45 @@ namespace PictureTagger.Controllers
 
 			if (ModelState.IsValid)
 			{
-					// Handle multiple files
-					foreach (string key in Request.Files)
+				// Handle multiple files
+				foreach (string key in Request.Files)
+				{
+					if (Request.Files[key]?.ContentLength == 0) continue;
+
+					// Get file object
+					var f = Request.Files[key] as HttpPostedFileBase;
+
+					// Save image locally with hash as the filename
+					string hash;
+					using (var sha1 = new SHA1CryptoServiceProvider())
 					{
-						if (Request.Files[key]?.ContentLength == 0) continue;
-
-						// Get file object
-						var f = Request.Files[key] as HttpPostedFileBase;
-
-						// Save image locally with hash as the filename
-						string hash;
-						using (var sha1 = new SHA1CryptoServiceProvider())
-						{
-							hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
-						}
-
-						hash = hash.SafeString();
-
-						var filename = Server.MapPath(@"~\UserData\");
-
-						// Save to UserData folder
-						Directory.CreateDirectory(filename);
-						f.SaveAs(filename + hash);
-
-						// Create a new Picture from the file
-						var picture = new Picture
-						{
-							OwnerID = ownerId,
-							Name = f.FileName,
-							Hash = hash,
-							ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
-							Tags = tags
-								.Split(',')
-								.Select(t => ResolveTag(_tagRepo, t))
-								.ToList()
-						};
-
-						// Add the picture
-						_pictureRepo.Create(picture);
+						hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
 					}
+
+					hash = hash.SafeString();
+
+					var filename = Server.MapPath(@"~\UserData\");
+
+					// Save to UserData folder
+					Directory.CreateDirectory(filename);
+					f.SaveAs(filename + hash);
+
+					// Create a new Picture from the file
+					var picture = new Picture
+					{
+						OwnerID = ownerId,
+						Name = f.FileName,
+						Hash = hash,
+						ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
+						Tags = tags
+							.Split(',')
+							.Select(t => ResolveTag(_tagRepo, t))
+							.ToList()
+					};
+
+					// Add the picture
+					_pictureRepo.Create(picture);
+				}
 
 				return RedirectToAction("Index");
 			}
@@ -114,49 +137,6 @@ namespace PictureTagger.Controllers
 				.ToList();
 		}
 
-		// GET: Pictures/Delete/5
-		public ActionResult Delete(int? id)
-		{
-			if (id == null)
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
-
-			Picture picture = _pictureRepo.Find(id);
-			if (picture == null)
-			{
-				return HttpNotFound();
-			}
-
-			return View((PictureView)picture);
-		}
-
-		// POST: Pictures/Delete/5
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public ActionResult DeleteConfirmed(int id)
-		{
-			Picture picture = _pictureRepo.Find(id);
-			_pictureRepo.Delete(id);
-			return RedirectToAction("Index");
-		}
-
-		// GET: Pictures/Details/5
-		[AllowAnonymous]
-		public ActionResult Details(int? id)
-		{
-			if (id == null)
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
-			Picture picture = _pictureRepo.Find(id);
-			if (picture == null)
-			{
-				return HttpNotFound();
-			}
-			return View((PictureView)picture);
-		}
-
 		// GET: Pictures/Edit/5
 		public ActionResult Edit(int? id)
 		{
@@ -171,6 +151,11 @@ namespace PictureTagger.Controllers
 				return HttpNotFound();
 			}
 
+			if (picture.OwnerID != User.Identity.GetUserId())
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+			}
+
 			return View((PictureView)picture);
 		}
 
@@ -183,6 +168,11 @@ namespace PictureTagger.Controllers
 		{
 			Picture picture = _pictureRepo.Find(pictureView.PictureID);
 
+			if (picture.OwnerID != User.Identity.GetUserId())
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+			}
+
 			if (ModelState.IsValid)
 			{
 				picture.Tags.Clear();
@@ -194,12 +184,40 @@ namespace PictureTagger.Controllers
 			return View((PictureView)picture);
 		}
 
-		// GET: Pictures
-		[AllowAnonymous]
-		public ActionResult Index()
+		// GET: Pictures/Delete/5
+		public ActionResult Delete(int? id)
 		{
-			var pictures = _pictureRepo.GetAll();
-			return View(pictures.ToList().RealCast<PictureView>());
+			if (id == null)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+
+			Picture picture = _pictureRepo.Find(id);
+			if (picture == null)
+			{
+				return HttpNotFound();
+			}
+
+			if (picture.OwnerID != User.Identity.GetUserId())
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+			}
+
+			return View((PictureView)picture);
+		}
+
+		// POST: Pictures/Delete/5
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public ActionResult DeleteConfirmed(int id)
+		{
+			Picture picture = _pictureRepo.Find(id);
+			if (picture.OwnerID != User.Identity.GetUserId())
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+			}
+			_pictureRepo.Delete(id);
+			return RedirectToAction("Index");
 		}
 
 		protected override void Dispose(bool disposing)
