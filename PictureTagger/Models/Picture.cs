@@ -5,8 +5,8 @@ namespace PictureTagger.Models
 {
 	using System.Collections.Generic;
 	using System.ComponentModel.DataAnnotations;
-	using PictureTagger.Models.ViewModels;
-	using PictureTagger.Models.ApiModels;
+	using ViewModels;
+	using ApiModels;
 
 	public partial class Picture
 	{
@@ -28,7 +28,7 @@ namespace PictureTagger.Models
 
 		public virtual ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
 
-		private static IRepository<Tag> tagRepository = new DatabaseRepository<Tag>(true);
+		private static IRepository<Tag> tagRepository = new DatabaseRepository<Tag>(false);
 
 		public static implicit operator Picture(PictureView pictureView)
 		{

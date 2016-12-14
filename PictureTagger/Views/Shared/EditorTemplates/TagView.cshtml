@@ -1,0 +1,8 @@
+﻿@using PictureTagger.Models.ViewModels
+@model ICollection<TagView>
+@{
+	var labels = string.Join(", ", Model.Select(t => t.TagLabel));
+	var name = ViewData.TemplateInfo.HtmlFieldPrefix;
+}
+
+<input type="text" name="@name" id="tags" placeholder="Tags" class="form-control" value="@labels" />

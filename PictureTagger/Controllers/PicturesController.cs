@@ -41,48 +41,50 @@ namespace PictureTagger.Controllers
 		{
 			var ownerId = User.Identity.GetUserId();
 
-            if (ModelState.IsValid)
+			if (ModelState.IsValid)
 			{
-                using (var tagRepo = new DatabaseRepository<Tag>(false))
-                {
-                    // Handle multiple files
-                    foreach (string key in Request.Files)
-                    {
-                        if (Request.Files[key]?.ContentLength == 0) continue;
+				using (var tagRepo = new DatabaseRepository<Tag>(false))
+				{
+					// Handle multiple files
+					foreach (string key in Request.Files)
+					{
+						if (Request.Files[key]?.ContentLength == 0) continue;
 
-                        // Get file object
-                        var f = Request.Files[key] as HttpPostedFileBase;
+						// Get file object
+						var f = Request.Files[key] as HttpPostedFileBase;
 
-                        // Save image locally with hash as the filename
-                        string hash;
-                        using (var sha1 = new SHA1CryptoServiceProvider())
-                        {
-                            hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
-                        }
+						// Save image locally with hash as the filename
+						string hash;
+						using (var sha1 = new SHA1CryptoServiceProvider())
+						{
+							hash = Convert.ToBase64String(sha1.ComputeHash(f.InputStream));
+						}
 
-                        var filename = Server.MapPath(@"~\UserData\");
+						hash = hash.SafeString();
 
-                        // Save to UserData folder
-                        Directory.CreateDirectory(filename);
-                        f.SaveAs(filename + hash);
+						var filename = Server.MapPath(@"~\UserData\");
 
-                        // Create a new Picture from the file
-                        var picture = new Picture
-                        {
-                            OwnerID = ownerId,
-                            Name = f.FileName,
-                            Hash = hash,
-                            ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
-                            Tags = tags
-                                .Split(',')
-                                .Select(t => ResolveTag(tagRepo, t))
-                                .ToList()
-                        };
+						// Save to UserData folder
+						Directory.CreateDirectory(filename);
+						f.SaveAs(filename + hash);
 
-                        // Add the picture
-                        _db.Create(picture);
-                    }
-                }
+						// Create a new Picture from the file
+						var picture = new Picture
+						{
+							OwnerID = ownerId,
+							Name = f.FileName,
+							Hash = hash,
+							ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
+							Tags = tags
+								.Split(',')
+								.Select(t => ResolveTag(tagRepo, t))
+								.ToList()
+						};
+
+						// Add the picture
+						_db.Create(picture);
+					}
+				}
 
 				return RedirectToAction("Index");
 			}
@@ -102,6 +104,15 @@ namespace PictureTagger.Controllers
 			{
 				TagLabel = tag
 			};
+		}
+
+		private static ICollection<Tag> ResolveTags(IRepository<Tag> repo, string tags)
+		{
+			return tags
+				.Split(',')
+				.Where(t => t.Length > 0)
+				.Select(t => ResolveTag(repo, t))
+				.ToList();
 		}
 
 		// GET: Pictures/Delete/5
@@ -169,10 +180,15 @@ namespace PictureTagger.Controllers
 		// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public ActionResult Edit([Bind(Include = "PictureID,OwnerID,Data,FileType,Name")] Picture picture)
+		public ActionResult Edit([Bind(Include = "PictureID,Name")] PictureView pictureView, string tags)
 		{
+			Picture picture = _db.Find(pictureView.PictureID);
+
 			if (ModelState.IsValid)
 			{
+				var tagRepo = new DatabaseRepository<Tag>(false);
+				picture.Tags.Clear();
+				picture.Tags = ResolveTags(tagRepo, tags);
 				_db.Update(picture);
 				return RedirectToAction("Index");
 			}

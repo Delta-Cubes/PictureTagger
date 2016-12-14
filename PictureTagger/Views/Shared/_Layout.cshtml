@@ -28,7 +28,14 @@
 	</div>
 
 	<div class="container body-content">
-		@RenderBody()
+		@if (ViewBag.NoMain != null)
+		{
+			@RenderBody()
+		}
+		else
+		{
+			<main>@RenderBody()</main>
+		}
 	</div>
 
 	<footer class="navbar navbar-inverse navbar-fixed-bottom">

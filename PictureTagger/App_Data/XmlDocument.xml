@@ -495,6 +495,13 @@
             <typeparam name="T">New type to cast to.</typeparam>
             <param name="collection">Collection of old types.</param>
         </member>
+        <member name="M:PictureTagger.Extensions.SafeString(System.String)">
+            <summary>
+            Convert a string with potentially filesystem-unsafe characters into a hex string.
+            </summary>
+            <param name="str">Potentially unsafe string.</param>
+            <returns>Hex encoded version of the string</returns>
+        </member>
         <member name="M:PictureTagger.Infrastructure.ThumbnailGenerator.Generate(System.IO.Stream)">
             <summary>
             Returns a small, low-quality JPEG of an image.
