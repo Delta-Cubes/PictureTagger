@@ -95,6 +95,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiControllers\ApiPicturesControllerTest.cs" />
+    <Compile Include="ApiControllers\ApiTagsControllerTest.cs" />
+    <Compile Include="Controllers\UnitTest_TagsController.cs" />
     <Compile Include="Controllers\UnitTest_PicturesController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\FakeRepository.cs" />
@@ -111,9 +114,7 @@
       <Name>PictureTagger</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ApiControllers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
