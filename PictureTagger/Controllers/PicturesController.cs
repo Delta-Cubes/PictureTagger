@@ -18,14 +18,16 @@ namespace PictureTagger.Controllers
 	[Authorize]
 	public class PicturesController : Controller
 	{
-		private IRepository<Picture> _db;
+		private IRepository<Picture> _pictureRepo;
+		private IRepository<Tag> _tagRepo;
 
-		public PicturesController() : this(new DatabaseRepository<Picture>())
+		public PicturesController() : this(new DatabaseRepository<Picture>(), new DatabaseRepository<Tag>(false))
 		{ }
 
-		public PicturesController(IRepository<Picture> db)
+		public PicturesController(IRepository<Picture> pictureRepo, IRepository<Tag> tagRepo)
 		{
-			_db = db;
+			_pictureRepo = pictureRepo;
+			_tagRepo = tagRepo;
 		}
 
 		// GET: Pictures/Create
@@ -43,8 +45,6 @@ namespace PictureTagger.Controllers
 
 			if (ModelState.IsValid)
 			{
-				using (var tagRepo = new DatabaseRepository<Tag>(false))
-				{
 					// Handle multiple files
 					foreach (string key in Request.Files)
 					{
@@ -77,14 +77,13 @@ namespace PictureTagger.Controllers
 							ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
 							Tags = tags
 								.Split(',')
-								.Select(t => ResolveTag(tagRepo, t))
+								.Select(t => ResolveTag(_tagRepo, t))
 								.ToList()
 						};
 
 						// Add the picture
-						_db.Create(picture);
+						_pictureRepo.Create(picture);
 					}
-				}
 
 				return RedirectToAction("Index");
 			}
@@ -123,7 +122,7 @@ namespace PictureTagger.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 
-			Picture picture = _db.Find(id);
+			Picture picture = _pictureRepo.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -137,8 +136,8 @@ namespace PictureTagger.Controllers
 		[ValidateAntiForgeryToken]
 		public ActionResult DeleteConfirmed(int id)
 		{
-			Picture picture = _db.Find(id);
-			_db.Delete(id);
+			Picture picture = _pictureRepo.Find(id);
+			_pictureRepo.Delete(id);
 			return RedirectToAction("Index");
 		}
 
@@ -150,7 +149,7 @@ namespace PictureTagger.Controllers
 			{
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
-			Picture picture = _db.Find(id);
+			Picture picture = _pictureRepo.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -166,7 +165,7 @@ namespace PictureTagger.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 
-			Picture picture = _db.Find(id);
+			Picture picture = _pictureRepo.Find(id);
 			if (picture == null)
 			{
 				return HttpNotFound();
@@ -182,14 +181,13 @@ namespace PictureTagger.Controllers
 		[ValidateAntiForgeryToken]
 		public ActionResult Edit([Bind(Include = "PictureID,Name")] PictureView pictureView, string tags)
 		{
-			Picture picture = _db.Find(pictureView.PictureID);
+			Picture picture = _pictureRepo.Find(pictureView.PictureID);
 
 			if (ModelState.IsValid)
 			{
-				var tagRepo = new DatabaseRepository<Tag>(false);
 				picture.Tags.Clear();
-				picture.Tags = ResolveTags(tagRepo, tags);
-				_db.Update(picture);
+				picture.Tags = ResolveTags(_tagRepo, tags);
+				_pictureRepo.Update(picture);
 				return RedirectToAction("Index");
 			}
 
@@ -200,7 +198,7 @@ namespace PictureTagger.Controllers
 		[AllowAnonymous]
 		public ActionResult Index()
 		{
-			var pictures = _db.GetAll();
+			var pictures = _pictureRepo.GetAll();
 			return View(pictures.ToList().RealCast<PictureView>());
 		}
 
@@ -208,7 +206,7 @@ namespace PictureTagger.Controllers
 		{
 			if (disposing)
 			{
-				_db.Dispose();
+				_pictureRepo.Dispose();
 			}
 			base.Dispose(disposing);
 		}
