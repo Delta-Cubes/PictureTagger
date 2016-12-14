@@ -223,6 +223,7 @@ namespace PictureTagger.Controllers
 			if (disposing)
 			{
 				_pictureRepo.Dispose();
+				_tagRepo.Dispose();
 			}
 			base.Dispose(disposing);
 		}
