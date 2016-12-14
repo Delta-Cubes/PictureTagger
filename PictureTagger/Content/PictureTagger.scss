@@ -70,3 +70,12 @@ img.full-loadable {
 	max-width: 200px;
 	height: 200px;
 }
+
+.pt-image-mosaic {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.pt-image {
+	float: none;
+}

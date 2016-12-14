@@ -60,7 +60,7 @@ namespace PictureTagger.Tests.Controllers
 			//Act
 			var controller = new PicturesController(repo, new FakeRepository<Tag>(e => e.TagID));
 			controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
-			var result = controller.Create(postedfile.Object, "tag1, tag2, tag3") as RedirectToRouteResult;
+			var result = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
 			var inserted = repo.GetAll().FirstOrDefault();
 
 			//Assert

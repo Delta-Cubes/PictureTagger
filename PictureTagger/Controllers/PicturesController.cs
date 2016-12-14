@@ -62,7 +62,7 @@ namespace PictureTagger.Controllers
 		// POST: Pictures/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public ActionResult Create(HttpPostedFileBase fileBase, string tags)
+		public ActionResult Create(HttpPostedFileBase fileBase, string tags, string name)
 		{
 			var ownerId = User.Identity.GetUserId();
 
@@ -95,13 +95,10 @@ namespace PictureTagger.Controllers
 					var picture = new Picture
 					{
 						OwnerID = ownerId,
-						Name = f.FileName,
+						Name = name,
 						Hash = hash,
 						ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
-						Tags = tags
-							.Split(',')
-							.Select(t => ResolveTag(_tagRepo, t))
-							.ToList()
+						Tags = ResolveTags(tags)
 					};
 
 					// Add the picture
@@ -114,11 +111,11 @@ namespace PictureTagger.Controllers
 			return View();
 		}
 
-		private static Tag ResolveTag(IRepository<Tag> repo, string tag)
+		private Tag ResolveTag(string tag)
 		{
 			tag = tag.Trim();
 
-			var resolved = repo
+			var resolved = _tagRepo
 				.GetAll()
 				.FirstOrDefault(t => t.TagLabel.Equals(tag, StringComparison.OrdinalIgnoreCase));
 
@@ -128,12 +125,12 @@ namespace PictureTagger.Controllers
 			};
 		}
 
-		private static ICollection<Tag> ResolveTags(IRepository<Tag> repo, string tags)
+		private ICollection<Tag> ResolveTags(string tags)
 		{
 			return tags
 				.Split(',')
 				.Where(t => t.Length > 0)
-				.Select(t => ResolveTag(repo, t))
+				.Select(t => ResolveTag(t))
 				.ToList();
 		}
 
@@ -176,7 +173,8 @@ namespace PictureTagger.Controllers
 			if (ModelState.IsValid)
 			{
 				picture.Tags.Clear();
-				picture.Tags = ResolveTags(_tagRepo, tags);
+				picture.Name = pictureView.Name;
+				picture.Tags = ResolveTags(tags);
 				_pictureRepo.Update(picture);
 				return RedirectToAction("Index");
 			}
