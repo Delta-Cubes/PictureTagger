@@ -9,9 +9,9 @@ namespace PictureTagger.Tests.Controllers
     /// Summary description for TagsControllerTest
     /// </summary>
     [TestClass]
-    public class TagsControllerTest
+    public class UnitTest_TagsController
     {
-        public TagsControllerTest()
+        public UnitTest_TagsController()
         {
             //
             // TODO: Add constructor logic here
