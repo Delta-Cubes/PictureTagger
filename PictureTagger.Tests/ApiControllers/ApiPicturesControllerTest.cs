@@ -58,7 +58,7 @@ namespace PictureTagger.Tests.ApiControllers
         //
         #endregion
 
-        [[TestMethod]
+        [TestMethod]
         public void ApiPicturesController_Index()
         {
             //
