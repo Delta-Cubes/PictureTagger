@@ -27,7 +27,7 @@
 </table>
 <img src="/UserData/@Html.DisplayFor(model => model.Hash)" alt="@Html.DisplayFor(model => model.Name)" style="max-width:100%; max-height:300px" />
 <p>
-    @if(Request.IsAuthenticated && User.Identity.GetUserId() == Model.OwnerId) {
+    @if(Request.IsAuthenticated && User.Identity.GetUserId() == Model.OwnerID) {
         @Html.ActionLink("Edit", "Edit", new { id = Model.PictureID }) |
         @Html.ActionLink("Delete", "Delete", new { id = Model.PictureID }) |
     }
