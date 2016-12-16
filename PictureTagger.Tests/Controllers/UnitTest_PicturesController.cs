@@ -41,7 +41,7 @@ namespace PictureTagger.Tests.Controllers
 		}
 
         [TestMethod]
-        public void TagsController_Index()
+        public void PicturesController_Index()
         {
             //Arrange
             var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
@@ -57,7 +57,7 @@ namespace PictureTagger.Tests.Controllers
         }
 
         [TestMethod]
-        public void TagsController_Details()
+        public void PicturesController_Details()
         {
             //Arrange
             var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);

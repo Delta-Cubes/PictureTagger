@@ -35,7 +35,7 @@ namespace PictureTagger.Tests.ApiControllers
 
             //Act
             var controller = new PicturesController(picturesRepo);
-            var result = controller.GetPictures() as IQueryable<PictureApi>;
+            var result = controller.GetPictures() as IEnumerable<PictureApi>;
 
             //Assert
             Assert.IsNotNull(result);

@@ -30,7 +30,7 @@ namespace PictureTagger.Tests.ApiControllers
 
             //Act
             var controller = new TagsController(tagsRepo);
-            var result = controller.GetTags() as IQueryable<TagApi>;
+            var result = controller.GetTags() as IEnumerable<TagApi>;
 
             //Assert
             Assert.IsNotNull(result);
@@ -70,7 +70,7 @@ namespace PictureTagger.Tests.ApiControllers
 
             //Act
             var controller = new TagsController(tagsRepo);
-            var result = controller.Suggestions("test") as IQueryable<TagApi>;
+            var result = controller.Suggestions("test") as IEnumerable<TagApi>;
 
             //Assert
             Assert.IsNotNull(result);

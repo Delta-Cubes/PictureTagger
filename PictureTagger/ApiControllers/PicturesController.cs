@@ -4,6 +4,7 @@ using System.Web.Http.Description;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
 using PictureTagger.Repositories;
+using System.Collections.Generic;
 
 namespace PictureTagger.ApiControllers
 {
@@ -23,7 +24,7 @@ namespace PictureTagger.ApiControllers
 
         // GET: api/Pictures
         [AllowAnonymous]
-        public IQueryable<PictureApi> GetPictures()
+        public IEnumerable<PictureApi> GetPictures()
         {
             return _db.GetAll().ToList().RealCast<PictureApi>().AsQueryable();
         }
