@@ -8,6 +8,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureTagger.Tests", "PictureTagger.Tests\PictureTagger.Tests.csproj", "{C0B6A058-B5D5-49A7-B0BA-DC63999E0CAD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureTagger.Tests.CodedUI", "PictureTagger.Tests.CodedUI\PictureTagger.Tests.CodedUI.csproj", "{93A5E92B-7EA0-466D-AA84-D787697C3F56}"
+	ProjectSection(ProjectDependencies) = postProject
+		{17ECBD44-F1B7-4357-9CF5-1F39A22F31D5} = {17ECBD44-F1B7-4357-9CF5-1F39A22F31D5}
+		{C0B6A058-B5D5-49A7-B0BA-DC63999E0CAD} = {C0B6A058-B5D5-49A7-B0BA-DC63999E0CAD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
