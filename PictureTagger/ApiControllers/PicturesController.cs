@@ -1,34 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using PictureTagger.Models;
 using PictureTagger.Models.ApiModels;
 using PictureTagger.Repositories;
-using Microsoft.AspNet.Identity;
 
 namespace PictureTagger.ApiControllers
 {
-    [Authorize]
+	[Authorize]
     public class PicturesController : ApiController
     {
         private IRepository<Picture> _db;
 
-        public PicturesController() : this(new DatabaseRepository<Picture>(true))
-        {
-        }
+		public PicturesController() : this(new DatabaseRepository<Picture>(new PictureTaggerContext(), false))
+		{
+		}
 
         public PicturesController(IRepository<Picture> dbPictures)
         {
-            this._db = dbPictures;
+			_db = dbPictures;
         }
 
         // GET: api/Pictures

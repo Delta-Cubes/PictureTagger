@@ -21,8 +21,9 @@ namespace PictureTagger.Controllers
 		private IRepository<Picture> _pictureRepo;
 		private IRepository<Tag> _tagRepo;
 
-		public PicturesController() : this(new DatabaseRepository<Picture>(), new DatabaseRepository<Tag>(false))
-		{ }
+		public PicturesController()
+		{
+		}
 
 		public PicturesController(IRepository<Picture> pictureRepo, IRepository<Tag> tagRepo)
 		{
@@ -56,7 +57,7 @@ namespace PictureTagger.Controllers
 		// GET: Pictures/Create
 		public ActionResult Create()
 		{
-			return View();
+			return View(new PictureView());
 		}
 
 		// POST: Pictures/Create
@@ -113,8 +114,6 @@ namespace PictureTagger.Controllers
 
 		private Tag ResolveTag(string tag)
 		{
-			tag = tag.Trim();
-
 			var resolved = _tagRepo
 				.GetAll()
 				.FirstOrDefault(t => t.TagLabel.Equals(tag, StringComparison.OrdinalIgnoreCase));
@@ -129,7 +128,9 @@ namespace PictureTagger.Controllers
 		{
 			return tags
 				.Split(',')
+				.Select(t => t.Trim())
 				.Where(t => t.Length > 0)
+				.Distinct()
 				.Select(t => ResolveTag(t))
 				.ToList();
 		}
