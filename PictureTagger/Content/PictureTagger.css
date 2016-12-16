@@ -49,8 +49,8 @@ h2, h3 {
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); }
 
 img.full-loadable {
-  max-width: 200px;
-  height: 200px; }
+  max-width: 200px !important;
+  height: 200px !important; }
 
 .pt-image-mosaic {
   display: flex;
@@ -58,4 +58,18 @@ img.full-loadable {
 
 .pt-image {
   float: none; }
+
+ul.suggestions-list {
+  padding: 0;
+  margin: 20px 0;
+  list-style: none;
+  max-width: 280px; }
+  ul.suggestions-list li {
+    margin-bottom: 3px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer; }
+    ul.suggestions-list li:hover {
+      background: #f9f9f9; }
 

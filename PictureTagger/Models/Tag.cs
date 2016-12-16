@@ -20,7 +20,7 @@ namespace PictureTagger.Models
 
 		public virtual ICollection<Picture> Pictures { get; set; } = new HashSet<Picture>();
 
-		private static IRepository<Picture> pictureRepository = new DatabaseRepository<Picture>(false);
+		private static IRepository<Picture> pictureRepository = new DatabaseRepository<Picture>(null, false);
 
 		public static implicit operator Tag(TagView tagView)
 		{

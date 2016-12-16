@@ -12,7 +12,7 @@ namespace PictureTagger.ApiControllers
     {
         private IRepository<Picture> _db;
 
-		public PicturesController() : this(new DatabaseRepository<Picture>(new PictureTaggerContext(), false))
+		public PicturesController() : this(new DatabaseRepository<Picture>(null, false))
 		{
 		}
 

@@ -67,8 +67,9 @@ h2, h3 {
 }
 
 img.full-loadable {
-	max-width: 200px;
-	height: 200px;
+	// Screw off, Bootstrap
+	max-width: 200px !important;
+	height: 200px !important;
 }
 
 .pt-image-mosaic {
@@ -78,4 +79,23 @@ img.full-loadable {
 
 .pt-image {
 	float: none;
+}
+
+ul.suggestions-list {
+	padding: 0;
+	margin: 20px 0;
+	list-style: none;
+	max-width: 280px;
+
+	li {
+		margin-bottom: 3px;
+		padding: 5px 10px;
+		border-radius: 3px;
+		background: #fff;
+		cursor: pointer;
+
+		&:hover {
+			background: #f9f9f9;
+		}
+	}
 }

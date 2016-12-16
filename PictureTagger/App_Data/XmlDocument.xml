@@ -481,6 +481,43 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:PictureTagger.DI.GetKnownTypes(System.Object)">
+            <summary>
+            Return a list of known types in the current context.
+            </summary>
+            <param name="context">Scope to check.</param>
+        </member>
+        <member name="M:PictureTagger.DI.GetInstance(System.Object,System.Type)">
+            <summary>
+            Get whatever instance is currently available for the type in the container.
+            </summary>
+            <param name="context">Scope to check.</param>
+            <param name="type">Type to find.</param>
+        </member>
+        <member name="M:PictureTagger.DI.RegisterTransient``2">
+            <summary>
+            Registers a class which will be instantiated when required.
+            </summary>
+            <typeparam name="TInterface">Interface that is to be implemented.</typeparam>
+            <typeparam name="TImplementation">Class implementing the interface.</typeparam>
+        </member>
+        <member name="M:PictureTagger.DI.RegisterScoped``1(System.Object,``0)">
+            <summary>
+            Register a class that already exists, scoped to a context.
+            </summary>
+            <typeparam name="TItem">Type of item to register.</typeparam>
+            <param name="context">Key to determine which scope the container should look in.</param>
+            <param name="item">Instantiated class to return.</param>
+        </member>
+        <member name="M:PictureTagger.DI.Instantiate``1(System.Type,System.Object)">
+            <summary>
+            Instantiate a class, injecting known objects into the constructor where available.
+            </summary>
+            <typeparam name="T">Type to cast the new object as.</typeparam>
+            <param name="type"></param>
+            <param name="context">Context used to look for scoped (optional).</param>
+            <returns></returns>
+        </member>
         <member name="M:PictureTagger.Extensions.RealCast``1(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Call implicit/explicit cast overloads for each item in a collection.
@@ -508,11 +545,12 @@
             </summary>
             <param name="data">Image data to resize.</param>
         </member>
-        <member name="M:PictureTagger.Repositories.DatabaseRepository`1.#ctor(System.Boolean)">
+        <member name="M:PictureTagger.Repositories.DatabaseRepository`1.#ctor(PictureTagger.Models.PictureTaggerContext,System.Boolean)">
             <summary>
             Create a new database connection.
             </summary>
-            <param name="proxy">Allow Entity Framework to proxy loaded objects?</param>
+            <param name="context">Existing context to use for this repository.</param>
+            <param name="proxy">Allow Entity Framework to proxy loaded objects?  Only applied when context is not set.</param>
         </member>
     </members>
 </doc>

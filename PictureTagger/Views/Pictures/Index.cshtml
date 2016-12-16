@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<PictureTagger.Models.ViewModels.PictureView>
+@using Microsoft.AspNet.Identity
 
 @{
 	ViewBag.Title = "Index";
@@ -25,6 +26,14 @@
 							<a href="/Tags/Details/@tag.TagID" class="badge">@tag.TagLabel</a>
 						}
 					</p>
+					@if (Request.IsAuthenticated && User.Identity.GetUserId() == picture.OwnerID)
+					{
+						<p>
+							@Html.ActionLink("Details", "Details", new { id = picture.PictureID }, new { @class = "btn btn-primary" })
+							@Html.ActionLink("Edit", "Edit", new { id = picture.PictureID }, new { @class = "btn btn-default" })
+							@Html.ActionLink("Delete", "Delete", new { id = picture.PictureID }, new { @class = "btn btn-danger" })
+						</p>
+					}
 				</div>
 			</div>
 		</div>
