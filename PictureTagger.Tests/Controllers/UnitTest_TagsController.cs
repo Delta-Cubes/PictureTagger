@@ -1,7 +1,17 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PictureTagger.Models;
+using PictureTagger.Models.ViewModels;
+using System.Collections.Generic;
+using Moq;
+using System.Web;
+using System.IO;
+using PictureTagger.Controllers;
+using System.Web.Mvc;
+using PictureTagger.Tests.Repositories;
+using System.Linq;
+using System.Security.Principal;
+using System.Web.Routing;
 
 namespace PictureTagger.Tests.Controllers
 {
@@ -11,83 +21,59 @@ namespace PictureTagger.Tests.Controllers
     [TestClass]
     public class UnitTest_TagsController
     {
-        public UnitTest_TagsController()
+        internal Mock<HttpContextBase> Context;
+        internal Mock<HttpRequestBase> Request;
+
+        [TestInitialize]
+        public void Initialize()
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            // Set up a fake HTTP context for each test that requires it
+            var fakeIdentity = new GenericIdentity("User");
+            var principal = new GenericPrincipal(fakeIdentity, null);
+            var context = new Mock<HttpContextBase>();
+            var controllerContext = new Mock<ControllerContext>();
+            var request = new Mock<HttpRequestBase>();
+            context.Setup(t => t.User).Returns(principal);
+            context.Setup(t => t.Server.MapPath(It.IsAny<string>())).Returns((string a) => a.Replace("~/", @"C:\Temp\"));
+            context.Setup(ctx => ctx.Request).Returns(request.Object);
+            controllerContext.Setup(t => t.HttpContext).Returns(context.Object);
+
+            Context = context;
+            Request = request;
         }
 
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
+        [TestMethod]
+        public void TagsController_Index()
         {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
+            //Arrange
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
 
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
+            //Act
+            var controller = new TagsController(tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var result = controller.Index() as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);
+        }
 
         [TestMethod]
         public void TagsController_Details()
         {
-            //
-            // TODO: Add test logic here
-            //
-        }
+            //Arrange
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
+            tagsRepo.Create(new Tag() {
+                TagID = 1,
+                TagLabel = "testing"
+            });
 
-        [TestMethod]
-        public void TagsController_Create()
-        {
-            //
-            // TODO: Add test logic here
-            //
-        }
+            //Act
+            var controller = new TagsController(tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var result = controller.Details(1) as ViewResult;
 
-        [TestMethod]
-        public void TagsController_Update()
-        {
-            //
-            // TODO: Add test logic here
-            //
-        }
-
-        [TestMethod]
-        public void TagsController_Delete()
-        {
-            //
-            // TODO: Add test logic here
-            //
+            //Assert
+            Assert.IsNotNull(result);
         }
     }
 }

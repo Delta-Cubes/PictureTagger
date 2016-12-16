@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PictureTagger.Models;
+using PictureTagger.Models.ViewModels;
 using System.Collections.Generic;
 using Moq;
 using System.Web;
@@ -39,34 +40,152 @@ namespace PictureTagger.Tests.Controllers
 			Request = request;
 		}
 
-		[TestMethod]
-		public void PictureController_Create()
-		{
-			//Arrange
-			var repo = new FakeRepository<Picture>(p => p.PictureID);
+        [TestMethod]
+        public void TagsController_Index()
+        {
+            //Arrange
+            var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
 
-			var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
-			var fakeFileKeys = new List<string>() { "file" };
-			var postedfile = new Mock<HttpPostedFileBase>();
+            //Act
+            var controller = new PicturesController(pictureRepo, tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var result = controller.Index() as ViewResult;
 
-			Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
-			postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
-			postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);
-			postedfile.Setup(e => e.InputStream).Returns(new MemoryStream(TEST_BMP));
-			postedfile.Setup(e => e.FileName).Returns("filename");
-			postedfile.Setup(e => e.ContentLength).Returns(TEST_BMP.Length);
-			postedfile.Verify(f => f.SaveAs(It.IsAny<string>()), Times.AtMostOnce());
+            //Assert
+            Assert.IsNotNull(result);           
+        }
 
-			//Act
-			var controller = new PicturesController(repo, new FakeRepository<Tag>(e => e.TagID));
-			controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
-			var result = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
-			var inserted = repo.GetAll().FirstOrDefault();
+        [TestMethod]
+        public void TagsController_Details()
+        {
+            //Arrange
+            var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
 
-			//Assert
-			Assert.IsNotNull(result);  // Check if the view returned a valid result
-			Assert.IsNotNull(inserted);  // Check if the picture was inserted
-			Assert.IsTrue(new string[] { "tag1", "tag2", "tag3" }.SequenceEqual(inserted.Tags.Select(t => t.TagLabel)));  // Check if the tags were set correctly
-		}
-	}
+            var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
+            var fakeFileKeys = new List<string>() { "file" };
+            var postedfile = new Mock<HttpPostedFileBase>();
+
+            Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
+            postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
+            postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);
+            postedfile.Setup(e => e.InputStream).Returns(new MemoryStream(TEST_BMP));
+            postedfile.Setup(e => e.FileName).Returns("filename");
+            postedfile.Setup(e => e.ContentLength).Returns(TEST_BMP.Length);
+            postedfile.Verify(f => f.SaveAs(It.IsAny<string>()), Times.AtMostOnce());
+
+            //Act
+            var controller = new PicturesController(pictureRepo, tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var result = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
+            var inserted = pictureRepo.GetAll().FirstOrDefault();
+            var detailsResult = controller.Details(inserted.PictureID) as ViewResult;
+
+            //Assert
+            Assert.IsNotNull(result);  // Check if the view returned a valid result
+            Assert.IsNotNull(inserted);  // Check if the picture was inserted
+            Assert.IsTrue(new string[] { "tag1", "tag2", "tag3" }.SequenceEqual(inserted.Tags.Select(t => t.TagLabel)));  // Check if the tags were set correctly
+            Assert.IsNotNull(detailsResult);
+        }
+
+        [TestMethod]
+        public void PictureController_Create()
+        {
+            //Arrange
+            var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
+
+            var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
+            var fakeFileKeys = new List<string>() { "file" };
+            var postedfile = new Mock<HttpPostedFileBase>();
+
+            Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
+            postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
+            postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);
+            postedfile.Setup(e => e.InputStream).Returns(new MemoryStream(TEST_BMP));
+            postedfile.Setup(e => e.FileName).Returns("filename");
+            postedfile.Setup(e => e.ContentLength).Returns(TEST_BMP.Length);
+            postedfile.Verify(f => f.SaveAs(It.IsAny<string>()), Times.AtMostOnce());
+
+            //Act
+            var controller = new PicturesController(pictureRepo, tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var result = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
+            var inserted = pictureRepo.GetAll().FirstOrDefault();
+
+            //Assert
+            Assert.IsNotNull(result);  // Check if the view returned a valid result
+            Assert.IsNotNull(inserted);  // Check if the picture was inserted
+            Assert.IsTrue(new string[] { "tag1", "tag2", "tag3" }.SequenceEqual(inserted.Tags.Select(t => t.TagLabel)));  // Check if the tags were set correctly
+        }
+
+        [TestMethod]
+        public void PictureController_Update()
+        {
+            //Arrange
+            var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
+
+            var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
+            var fakeFileKeys = new List<string>() { "file" };
+            var postedfile = new Mock<HttpPostedFileBase>();
+
+            Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
+            postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
+            postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);
+            postedfile.Setup(e => e.InputStream).Returns(new MemoryStream(TEST_BMP));
+            postedfile.Setup(e => e.FileName).Returns("filename");
+            postedfile.Setup(e => e.ContentLength).Returns(TEST_BMP.Length);
+            postedfile.Verify(f => f.SaveAs(It.IsAny<string>()), Times.AtMostOnce());
+
+            //Act
+            var controller = new PicturesController(pictureRepo, tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var createResult = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
+            var inserted = pictureRepo.GetAll().FirstOrDefault();
+            var updateResult = controller.Edit((PictureView)inserted, "tag1, tag2") as RedirectToRouteResult;
+
+            //Assert
+            Assert.IsNotNull(createResult);  // Check if the view returned a valid result
+            Assert.IsNotNull(inserted);  // Check if the picture was inserted
+            Assert.IsNotNull(updateResult); // Check if the view returned a valid result.
+            Assert.IsTrue(new string[] { "tag1", "tag2" }.SequenceEqual(inserted.Tags.Select(t => t.TagLabel)));  // Check if the tags were set correctly
+        }
+
+        [TestMethod]
+        public void PictureController_Delete()
+        {
+            //Arrange
+            var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
+            var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
+
+            var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
+            var fakeFileKeys = new List<string>() { "file" };
+            var postedfile = new Mock<HttpPostedFileBase>();
+
+            Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
+            postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
+            postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);
+            postedfile.Setup(e => e.InputStream).Returns(new MemoryStream(TEST_BMP));
+            postedfile.Setup(e => e.FileName).Returns("filename");
+            postedfile.Setup(e => e.ContentLength).Returns(TEST_BMP.Length);
+            postedfile.Verify(f => f.SaveAs(It.IsAny<string>()), Times.AtMostOnce());
+
+            //Act
+            var controller = new PicturesController(pictureRepo, tagsRepo);
+            controller.ControllerContext = new ControllerContext(Context.Object, new RouteData(), controller);
+            var createResult = controller.Create(postedfile.Object, "tag1, tag2, tag3", "custom name") as RedirectToRouteResult;
+            var inserted = pictureRepo.GetAll().FirstOrDefault();
+            var deleteResult = controller.DeleteConfirmed(inserted.PictureID) as RedirectToRouteResult;
+            var insertedCount = pictureRepo.GetAll().Count();
+
+            //Assert
+            Assert.IsNotNull(createResult);  // Check if the view returned a valid result
+            Assert.IsNotNull(inserted);  // Check if the picture was inserted
+            Assert.IsNotNull(deleteResult); // Check if the view returned a valid result.
+            Assert.IsTrue(insertedCount == 0); // Checks if the picture was deleted.
+        }
+
+    }
 }
