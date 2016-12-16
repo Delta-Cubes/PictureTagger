@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace PictureTagger
 {
@@ -15,9 +16,10 @@ namespace PictureTagger
 		/// <param name="context">Scope to check.</param>
 		private static IEnumerable<Type> GetKnownTypes(object context)
 		{
-			if (context == null) return Enumerable.Empty<Type>();
-
 			var knownTransients = _transients.Select(s => s.Key);
+
+			if (context == null) return knownTransients;
+
 			var knownScoped = _scoped
 				.FirstOrDefault(t => t.Key == context)
 				.Value
@@ -106,30 +108,24 @@ namespace PictureTagger
 				.FirstOrDefault(c => c.GetParameters()
 					.Where(p => !p.HasDefaultValue)
 					.Select(p => p.ParameterType)
+					.Distinct()
 					.Except(knownTypes)
 					.Count() == 0);
 
 			if (injectConstructor != null)
 			{
-				// Don't also get parameters with no default value
-				// They will be instantiated as "null" which Invoke will treat as the default value anyway
-				var injectableParamters = injectConstructor
-					.GetParameters()
-					.ToList();
-
-				// Fill each parameter with their injected values
-				var parameters = new object[injectableParamters.Count];
-				for (int i = 0; i < injectableParamters.Count; ++i)
-				{
-					var instance = GetInstance(context, injectableParamters[i].ParameterType);
-					parameters[i] = instance;
-				}
-
+				var parameters = InjectParameters(context, injectConstructor).ToArray();
 				return (T)injectConstructor.Invoke(parameters);
 			}
 
-			// No compatible constructor found, attempt to call the paramterless constructor
+			// No compatible constructor found, attempt to call the parameterless constructor
 			return (T)Activator.CreateInstance(type);
+		}
+
+		private static IEnumerable<object> InjectParameters(object context, ConstructorInfo constructor)
+		{
+			foreach (var param in constructor.GetParameters())
+				yield return GetInstance(context, param.ParameterType);
 		}
 	}
 }
