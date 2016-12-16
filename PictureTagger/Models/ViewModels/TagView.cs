@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace PictureTagger.Models.ViewModels
 {
-    public class TagView
+	public class TagView
     {
         public int TagID { get; set; }
         public string TagLabel { get; set; }
@@ -24,7 +23,7 @@ namespace PictureTagger.Models.ViewModels
                     Hash = p.Hash,
                     ThumbnailData = p.ThumbnailData,
                     ThumbnailBase64Data = $"data:image/jpeg;base64,{Convert.ToBase64String(p.ThumbnailData)}",
-                    OwnerID = p.OwnerID,
+                    OwnerID = p.OwnerID
                 }).ToList()
             };
         }

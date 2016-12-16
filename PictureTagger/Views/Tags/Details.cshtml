@@ -2,42 +2,44 @@
 @using Microsoft.AspNet.Identity
 
 @{
-    ViewBag.Title = "Details";
+	ViewBag.Title = "Details";
 }
 
-<h2>@Model.TagLabel</h2>
+<h2>Pictures tagged "@Model.TagLabel"</h2>
 
 <div class="container-fluid pt-image-mosaic">
-    @foreach (var picture in Model.Pictures)
-    {
-        var tags = string.Join(", ", picture.Tags.Select(t => t.TagLabel));
-        <div class="col-sm-3 pt-image">
-            <div class="thumbnail">
-                <a href="/Pictures/Details/@picture.PictureID"><img src="@picture.ThumbnailBase64Data" alt="@tags" class="img-thumbnail full-loadable" data-full-src="/UserData/@picture.Hash" /></a>
-                <div class="caption">
-                    <h3>@picture.Name</h3>
-                    <p class="text-muted">
-                        @foreach (var tag in picture.Tags.OrderBy(t => t.TagLabel))
-                        {
-                            <a href="/Tags/Details/@tag.TagID" class="badge">@tag.TagLabel</a>
-                        }
-                    </p>
-                </div>
-            </div>
-        </div>
-    }
+	@foreach (var picture in Model.Pictures)
+	{
+		var tags = string.Join(", ", picture.Tags.Select(t => t.TagLabel));
+		<div class="col-sm-3 pt-image">
+			<div class="thumbnail">
+				<a href="/Pictures/Details/@picture.PictureID">
+					<img src="@picture.ThumbnailBase64Data" alt="@tags" class="img-thumbnail full-loadable" data-full-src="/UserData/@picture.Hash" />
+				</a>
+				<div class="caption">
+					<h3>@picture.Name</h3>
+					<p class="text-muted">
+						@foreach (var tag in picture.Tags.OrderBy(t => t.TagLabel))
+						{
+							<a href="/Tags/Details/@tag.TagID" class="badge">@tag.TagLabel</a>
+						}
+					</p>
+				</div>
+			</div>
+		</div>
+	}
 </div>
 
 
 <p>
-    @Html.ActionLink("Back to List", "Index")
+	@Html.ActionLink("Back to List", "Index")
 </p>
 
 @section scripts {
-    <script>
+	<script>
 		$(".full-loadable").hover(function () {
 			let src = $(this).data("full-src");
 			$(this).attr("src", src);
 		});
-    </script>
+	</script>
 }

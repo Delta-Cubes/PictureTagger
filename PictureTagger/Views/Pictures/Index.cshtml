@@ -17,7 +17,9 @@
 		var tags = string.Join(", ", picture.Tags.Select(t => t.TagLabel));
 		<div class="col-sm-3 pt-image">
 			<div class="thumbnail">
-				<a href="/Pictures/Details/@picture.PictureID"><img src="@picture.ThumbnailBase64Data" alt="@tags" class="img-thumbnail full-loadable" data-full-src="/UserData/@picture.Hash" /></a>
+				<a href="/Pictures/Details/@picture.PictureID">
+					<img src="@picture.ThumbnailBase64Data" alt="@tags" class="img-thumbnail full-loadable" data-full-src="/UserData/@picture.Hash" />
+				</a>
 				<div class="caption">
 					<h3>@picture.Name</h3>
 					<p class="text-muted">
