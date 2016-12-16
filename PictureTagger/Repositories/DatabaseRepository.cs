@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System;
+using System.Diagnostics;
 
 namespace PictureTagger.Repositories
 {
@@ -30,8 +31,16 @@ namespace PictureTagger.Repositories
 			}
 			catch (DbEntityValidationException e)
 			{
-				throw e;
-			}
+                foreach (var validationErrors in e.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        Trace.TraceInformation("Property: {0} Error: {1}",
+                                                validationError.PropertyName,
+                                                validationError.ErrorMessage);
+                    }
+                }
+            }
 		}
 
 		public void Create(T model)
