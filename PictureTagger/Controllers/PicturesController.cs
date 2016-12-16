@@ -21,10 +21,6 @@ namespace PictureTagger.Controllers
 		private IRepository<Picture> _pictureRepo;
 		private IRepository<Tag> _tagRepo;
 
-		public PicturesController()
-		{
-		}
-
 		public PicturesController(IRepository<Picture> pictureRepo, IRepository<Tag> tagRepo)
 		{
 			_pictureRepo = pictureRepo;

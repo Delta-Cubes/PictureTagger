@@ -2,34 +2,25 @@
 @using Microsoft.AspNet.Identity
 
 @{
-    ViewBag.Title = "Details";
+	ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+<h2>@Model.Name</h2>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>@Html.DisplayNameFor(model => model.Tags)</th>
-    </tr>
-
-    <tr>
-        <td>
-            @Html.DisplayFor(model => model.Name)
-        </td>
-        <td>
-            @string.Join(",", Model.Tags.Select(t => t.TagLabel))
-        </td>
-    </tr>
-
-</table>
 <img src="/UserData/@Html.DisplayFor(model => model.Hash)" alt="@Html.DisplayFor(model => model.Name)" style="max-width:100%; max-height:300px" />
+
+<p class="text-muted">
+	@foreach (var tag in Model.Tags.OrderBy(t => t.TagLabel))
+	{
+		<a href="/Tags/Details/@tag.TagID" class="badge">@tag.TagLabel</a>
+	}
+</p>
+
 <p>
-    @if(Request.IsAuthenticated && User.Identity.GetUserId() == Model.OwnerID) {
-        @Html.ActionLink("Edit", "Edit", new { id = Model.PictureID })
-        @Html.ActionLink("Delete", "Delete", new { id = Model.PictureID })
-    }
-    @Html.ActionLink("Back to List", "Index")
+	@if (Request.IsAuthenticated && User.Identity.GetUserId() == Model.OwnerID)
+	{
+		@Html.ActionLink("Edit", "Edit", new { id = Model.PictureID }, new { @class = "btn btn-default" })
+		@Html.ActionLink("Delete", "Delete", new { id = Model.PictureID }, new { @class = "btn btn-danger" })
+	}
+	@Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-default" })
 </p>
