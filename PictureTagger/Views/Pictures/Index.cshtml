@@ -26,14 +26,15 @@
 							<a href="/Tags/Details/@tag.TagID" class="badge">@tag.TagLabel</a>
 						}
 					</p>
-					@if (Request.IsAuthenticated && User.Identity.GetUserId() == picture.OwnerID)
-					{
-						<p>
-							@Html.ActionLink("Details", "Details", new { id = picture.PictureID }, new { @class = "btn btn-primary" })
+					<p>
+						@Html.ActionLink("Details", "Details", new { id = picture.PictureID }, new { @class = "btn btn-primary" })
+
+						@if (Request.IsAuthenticated && User.Identity.GetUserId() == picture.OwnerID)
+						{
 							@Html.ActionLink("Edit", "Edit", new { id = picture.PictureID }, new { @class = "btn btn-default" })
 							@Html.ActionLink("Delete", "Delete", new { id = picture.PictureID }, new { @class = "btn btn-danger" })
-						</p>
-					}
+						}
+					</p>
 				</div>
 			</div>
 		</div>
