@@ -94,6 +94,8 @@ namespace PictureTagger.Controllers
 						OwnerID = ownerId,
 						Name = name,
 						Hash = hash,
+						Filesize = f.ContentLength,
+						OriginalType = f.ContentType,
 						ThumbnailData = ThumbnailGenerator.Generate(f.InputStream),
 						Tags = ResolveTags(tags)
 					};

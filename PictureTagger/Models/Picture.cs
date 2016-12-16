@@ -23,6 +23,12 @@ namespace PictureTagger.Models
 		public string Hash { get; set; }
 
 		[Required]
+		public int Filesize { get; set; }
+
+		[Required]
+		public string OriginalType { get; set; }
+
+		[Required]
 		[StringLength(60)]
 		public string Name { get; set; }
 

@@ -236,6 +236,10 @@
     <Compile Include="Migrations\201612130101423_Thumbnails.Designer.cs">
       <DependentUpon>201612130101423_Thumbnails.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612162138445_Types.cs" />
+    <Compile Include="Migrations\201612162138445_Types.Designer.cs">
+      <DependentUpon>201612162138445_Types.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApiModels\PictureApi.cs" />
@@ -379,6 +383,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612130101423_Thumbnails.resx">
       <DependentUpon>201612130101423_Thumbnails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612162138445_Types.resx">
+      <DependentUpon>201612162138445_Types.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
