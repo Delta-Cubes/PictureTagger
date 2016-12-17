@@ -12,6 +12,9 @@ namespace PictureTagger.Controllers
 	{
 		private IRepository<Tag> _db;
 
+		/// <summary>
+		/// Constructor accepting a repository of tags.  This is intended to be injected by the IoC container
+		/// </summary>
 		public TagsController(IRepository<Tag> db)
 		{
 			_db = db;

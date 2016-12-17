@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Web;
 
 namespace PictureTagger.Infrastructure
 {
 	public class ThumbnailGenerator
 	{
 		/// <summary>
-		/// Returns a small, low-quality JPEG of an image.
+		/// Returns a small but extremely low-quality JPEG of an image.
 		/// </summary>
 		/// <param name="data">Image data to resize.</param>
 		public static byte[] Generate(Stream data)
 		{
+			// Create a bitmap from the raw image data
 			using (var bits = new Bitmap(data))
+
+			// Load it into a new bitmap of size 32x32
 			using (var resized = new Bitmap(bits, new Size(32, 32)))
+
+			// Output it as a JPEG with 25% quality
 			using (var output = new MemoryStream())
 			{
 				var codec = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");

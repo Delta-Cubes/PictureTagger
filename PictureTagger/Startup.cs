@@ -1,14 +1,17 @@
 ﻿using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(PictureTagger.Startup))]
+[assembly: OwinStartup(typeof(PictureTagger.Startup))]
 namespace PictureTagger
 {
-    public partial class Startup
-    {
-        public void Configuration(IAppBuilder app)
-        {
-            ConfigureAuth(app);
-        }
-    }
+	/// <summary>
+	/// Startups are the hip new thing, right?
+	/// </summary>
+	public partial class Startup
+	{
+		public void Configuration(IAppBuilder app)
+		{
+			ConfigureAuth(app);
+		}
+	}
 }

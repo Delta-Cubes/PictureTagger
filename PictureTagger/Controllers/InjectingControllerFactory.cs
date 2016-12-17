@@ -3,6 +3,9 @@ using System.Web.Routing;
 
 namespace PictureTagger.Controllers
 {
+	/// <summary>
+	/// Automatically detect and inject registered entities for controllers
+	/// </summary>
 	public class InjectingControllerFactory : DefaultControllerFactory
 	{
 		public override IController CreateController(RequestContext requestContext, string controllerName)

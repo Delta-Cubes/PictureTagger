@@ -22,6 +22,9 @@ namespace PictureTagger.Models
 
 		private static IRepository<Picture> pictureRepository = new DatabaseRepository<Picture>(null, false);
 
+		/// <summary>
+		/// Allows easy conversion between a Tag and TagView
+		/// </summary>
 		public static implicit operator Tag(TagView tagView)
 		{
 			return new Tag()
@@ -32,6 +35,9 @@ namespace PictureTagger.Models
 			};
 		}
 
+		/// <summary>
+		/// Allows easy conversion between a Tag and TagApi
+		/// </summary>
 		public static implicit operator Tag(TagApi tagApi)
 		{
 			return new Tag()

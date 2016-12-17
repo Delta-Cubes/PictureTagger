@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace PictureTagger.Repositories
 {
+	/// <summary>
+	/// Generic interface to define how a repository should be implemented
+	/// </summary>
+	/// <typeparam name="T">Type of entity this repository manages</typeparam>
 	public interface IRepository<T> : IDisposable
 	{
 		IQueryable<T> GetAll();

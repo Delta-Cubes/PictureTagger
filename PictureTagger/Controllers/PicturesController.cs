@@ -110,6 +110,11 @@ namespace PictureTagger.Controllers
 			return View();
 		}
 
+		/// <summary>
+		/// Return the actual tag object matching the string, or a new Tag object if none exists
+		/// </summary>
+		/// <param name="tag">Tag label to match</param>
+		/// <returns>Existing or new tag</returns>
 		private Tag ResolveTag(string tag)
 		{
 			var resolved = _tagRepo
@@ -122,6 +127,10 @@ namespace PictureTagger.Controllers
 			};
 		}
 
+		/// <summary>
+		/// Resolve a single comma-separated string of tag
+		/// </summary>
+		/// <param name="tags">Comman-separated string of tags</param>
 		private ICollection<Tag> ResolveTags(string tags)
 		{
 			return tags

@@ -18,10 +18,16 @@ namespace PictureTagger.Tests.Controllers
 	[TestClass]
 	public class UnitTest_PicturesController
 	{
+		/// <summary>
+		/// 1x1 red pixel bitmap
+		/// </summary>
 		private static readonly byte[] TEST_BMP = new byte[] { 66, 77, 58, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 40, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 196, 14, 0, 0, 196, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255 };
 		internal Mock<HttpContextBase> Context;
 		internal Mock<HttpRequestBase> Request;
 
+		/// <summary>
+		/// Called before tests are run, sets up stuff like the request and controller contexts for more injection magic
+		/// </summary>
 		[TestInitialize]
 		public void Initialize()
 		{
@@ -53,7 +59,7 @@ namespace PictureTagger.Tests.Controllers
             var result = controller.Index() as ViewResult;
 
             //Assert
-            Assert.IsNotNull(result);           
+            Assert.IsNotNull(result);
         }
 
         [TestMethod]
@@ -96,10 +102,12 @@ namespace PictureTagger.Tests.Controllers
             var pictureRepo = new FakeRepository<Picture>(p => p.PictureID);
             var tagsRepo = new FakeRepository<Tag>(e => e.TagID);
 
+			// Create mocks for EVERYTHING - we're uploading a real file to a fake repo!
             var postedfilesKeyCollection = new Mock<HttpFileCollectionBase>();
             var fakeFileKeys = new List<string>() { "file" };
             var postedfile = new Mock<HttpPostedFileBase>();
 
+			// More boilerplate to fake more things happening when the file uploads
             Request.Setup(req => req.Files).Returns(postedfilesKeyCollection.Object);
             postedfilesKeyCollection.Setup(keys => keys.GetEnumerator()).Returns(fakeFileKeys.GetEnumerator());
             postedfilesKeyCollection.Setup(keys => keys["file"]).Returns(postedfile.Object);

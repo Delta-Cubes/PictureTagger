@@ -9,6 +9,7 @@ namespace PictureTagger
 	{
 		/// <summary>
 		/// Call implicit/explicit cast overloads for each item in a collection.
+		/// Why is this required?  https://github.com/dotnet/corefx/issues/14511
 		/// </summary>
 		/// <typeparam name="T">New type to cast to.</typeparam>
 		/// <param name="collection">Collection of old types.</param>

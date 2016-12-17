@@ -18,6 +18,7 @@ namespace PictureTagger.Repositories
 		/// <param name="proxy">Allow Entity Framework to proxy loaded objects?  Only applied when context is not set.</param>
 		public DatabaseRepository(PictureTaggerContext context, bool proxy = true)
 		{
+			// Use the existing context, or create a new one?
 			if (context != null)
 			{
 				_db = context;
@@ -30,6 +31,9 @@ namespace PictureTagger.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Calles SaveChanges() in a way that entity validation errors are caught properly
+		/// </summary>
 		private void SafeSaveChanges()
 		{
 			try
@@ -38,6 +42,7 @@ namespace PictureTagger.Repositories
 			}
 			catch (DbEntityValidationException e)
 			{
+				// Log each error
 				foreach (var validationErrors in e.EntityValidationErrors)
 				{
 					foreach (var validationError in validationErrors.ValidationErrors)
@@ -50,26 +55,52 @@ namespace PictureTagger.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Add a new entity to the database
+		/// </summary>
+		/// <param name="model">New entity to add</param>
 		public void Create(T model)
 		{
 			_db.Set<T>().Add(model);
 			SafeSaveChanges();
 		}
 
+		/// <summary>
+		/// Delete an entity from the database
+		/// </summary>
+		/// <param name="keyValues">Key values</param>
 		public void Delete(params object[] keyValues) => Delete(Find(keyValues));
 
+		/// <summary>
+		/// Delete an entity from the database
+		/// </summary>
+		/// <param name="model">Instantiated model to remove</param>
 		public void Delete(T model)
 		{
 			_db.Set<T>().Remove(model);
 			SafeSaveChanges();
 		}
 
+		/// <summary>
+		/// Release unmanaged memory associated with the context
+		/// </summary>
 		public void Dispose() => _db.Dispose();
 
+		/// <summary>
+		/// Get all entities in the set of type T
+		/// </summary>
 		public IQueryable<T> GetAll() => _db.Set<T>();
 
+		/// <summary>
+		/// Find an entity by its key values
+		/// </summary>
+		/// <param name="keyValues">Key values</param>
 		public T Find(params object[] keyValues) => _db.Set<T>().Find(keyValues);
 
+		/// <summary>
+		/// Update all properties in a proxied entity
+		/// </summary>
+		/// <param name="model">Entity with properties to update</param>
 		public void Update(T model)
 		{
 			_db.Entry(model).State = EntityState.Modified;

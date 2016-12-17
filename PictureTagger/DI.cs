@@ -5,9 +5,19 @@ using System.Reflection;
 
 namespace PictureTagger
 {
+	/// <summary>
+	/// Homemade probably garbage Dependency Injection/IoC thing!
+	/// </summary>
 	public static class DI
 	{
+		/// <summary>
+		/// Entities to instiate every time they are requested.
+		/// </summary>
 		private static Dictionary<Type, Type> _transients { get; } = new Dictionary<Type, Type>();
+
+		/// <summary>
+		/// Already-instantiated entities scoped to an object reference.
+		/// </summary>
 		private static Dictionary<object, HashSet<object>> _scoped { get; } = new Dictionary<object, HashSet<object>>();
 
 		/// <summary>
@@ -40,11 +50,13 @@ namespace PictureTagger
 				.FirstOrDefault(s => s.Key == type)
 				.Value;
 
+			// Transients are valuable so use them first
 			if (transientImpl != null)
 			{
 				return Instantiate<object>(transientImpl, context);
 			}
 
+			// No context?  No scope?  No deal.
 			if (context == null) return null;
 
 			// If nothing was found, attempt to find a matching scoped
@@ -84,6 +96,10 @@ namespace PictureTagger
 			}
 		}
 
+		/// <summary>
+		/// Remove all registered objects in the context.
+		/// </summary>
+		/// <param name="context">Context reference.</param>
 		internal static void UnregisterScoped(object context)
 		{
 			_scoped.Remove(context);
@@ -102,6 +118,10 @@ namespace PictureTagger
 			var knownTypes = GetKnownTypes(context);
 
 			// Find a compatible constructor to inject into
+			// Must have parameters, otherwise why bother
+			// Don't care about parameters with default values
+			// Only care about distinct types for now
+			// The Except(knownTypes) thing is just my crappy solution to test if all things are satisfied, probably could do the same with .All() or something
 			var injectConstructor = type
 				.GetConstructors()
 				.Where(c => c.GetParameters().Length > 0)
@@ -112,6 +132,7 @@ namespace PictureTagger
 					.Except(knownTypes)
 					.Count() == 0);
 
+			// If a valid constructor was found, use it
 			if (injectConstructor != null)
 			{
 				var parameters = InjectParameters(context, injectConstructor).ToArray();
@@ -122,6 +143,11 @@ namespace PictureTagger
 			return (T)Activator.CreateInstance(type);
 		}
 
+		/// <summary>
+		/// Lazily get instances for each parameter in a valid constructor.
+		/// </summary>
+		/// <param name="context">Context reference to look in for scoped entities.</param>
+		/// <param name="constructor">Valid constructor accepting nothing but known/registered types.</param>
 		private static IEnumerable<object> InjectParameters(object context, ConstructorInfo constructor)
 		{
 			foreach (var param in constructor.GetParameters())
